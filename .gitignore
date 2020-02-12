@@ -4,6 +4,9 @@
 # docs
 docs/
 
+# build/coverage
+build/coverage
+
 # Logs
 logs
 *.log
