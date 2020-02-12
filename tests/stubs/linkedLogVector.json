@@ -1,0 +1,30 @@
+{
+    "vectors": [
+        {
+            "id": "1",
+            "linkedVector": {
+                "id": "1234",
+                "version": 0
+            },
+            "edges": [],
+            "version": 0,
+            "graphId": "0",
+            "url": "index",
+            "data": "",
+            "properties": {},
+            "template": {}
+        }
+    ],
+    "id": "0",
+    "version": 0,
+    "properties": {
+        "name": "",
+        "description": "",
+        "createdBy": "",
+        "createdOn": 0,
+        "lastUpdate": 0,
+        "exportable": false,
+        "height": 1,
+        "width": 1
+    }
+}

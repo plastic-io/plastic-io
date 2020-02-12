@@ -1,0 +1,54 @@
+{
+    "vectors": [
+        {
+            "id": "1",
+            "edges": [
+                {
+                    "field": "proxy",
+                    "connectors": [
+                        {
+                            "id": "0",
+                            "vectorId": "2",
+                            "field": "proxy",
+                            "graphId": "0",
+                            "version": 0,
+                            "type": "normal"
+                        }
+                    ]
+                }
+            ],
+            "version": 0,
+            "graphId": "0",
+            "url": "index",
+            "data": "",
+            "properties": {},
+            "template": {
+                "set": "edges.proxy = value;"
+            }
+        },
+        {
+            "id": "2",
+            "edges": [],
+            "version": 0,
+            "graphId": "0",
+            "url": "",
+            "data": "",
+            "properties": {},
+            "template": {
+                "set": "console.info(value);console.warn(data)"
+            }
+        }
+    ],
+    "id": "0",
+    "version": 0,
+    "properties": {
+        "name": "",
+        "description": "",
+        "createdBy": "",
+        "createdOn": 0,
+        "lastUpdate": 0,
+        "exportable": false,
+        "height": 1,
+        "width": 1
+    }
+}

@@ -1,0 +1,47 @@
+{
+    "name": "@plastic-io/plastic-io",
+    "license": "BSD-3-Clause",
+    "author": "TonyGermaneri@gmail.com",
+    "version": "0.1.1",
+    "description": "JavaScript graph programming lanague.",
+    "main": "./dist/plastic-io.js",
+    "types": "./dist/plastic-io.d.ts",
+    "scripts": {
+        "build": "./node_modules/.bin/tsc",
+        "build-watch": "npm run build && nodemon -e ts --watch src --exec npm run build",
+        "lint": "./node_modules/.bin/eslint ./src/*.ts",
+        "test": "./node_modules/.bin/jest",
+        "test-watch": "nodemon -e ts --watch src --exec npm run test",
+        "build-docs": "./node_modules/.bin/typedoc"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:plastic-io/plastic-io.git"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.8.4",
+        "@babel/parser": "^7.8.4",
+        "@babel/preset-env": "^7.8.4",
+        "@babel/preset-typescript": "^7.8.3",
+        "@babel/types": "^7.8.3",
+        "@types/acorn": "^4.0.5",
+        "@types/escodegen": "0.0.6",
+        "@types/jest": "^25.1.1",
+        "@types/node": "^12.7.4",
+        "@typescript-eslint/eslint-plugin": "^2.19.0",
+        "@typescript-eslint/parser": "^2.19.0",
+        "babel-jest": "^25.1.0",
+        "eslint": "^6.8.0",
+        "jest": "^25.1.0",
+        "meriyah": "^1.9.7",
+        "nodemon": "^2.0.2",
+        "ts-jest": "^25.2.0",
+        "tslint": "^6.0.0",
+        "typedoc": "^0.16.9",
+        "typescript": "^3.7.5"
+    },
+    "dependencies": {
+        "acorn": "^7.1.0",
+        "escodegen": "^1.14.1"
+    }
+}
