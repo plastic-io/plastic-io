@@ -10,17 +10,18 @@ export default interface Edge {
 }
 /** Executes a given edge.  Edges are always inputs (LTR) */
 export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector, field: string, value: any): Promise<any> {
+    const start = Date.now();
     scheduler.dispatchEvent("beginedge", {
-        time: Date.now(),
+        time: start,
         id: newId(),
     } as SchedulerEvent);
-    const start = Date.now();
     scheduler.logger.debug("Edge: Vector.execute: vector.id:field " + vector.id + ":" + field);
     function end(): void {
+        const now = Date.now();
         scheduler.dispatchEvent("endedge", {
-            time: Date.now(),
+            time: now,
             id: newId(),
-            duration: Date.now() - start,
+            duration: now - start,
         } as SchedulerEvent);
     }
     vectorExecute(scheduler, graph, vector, field, value)

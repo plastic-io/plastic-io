@@ -2,7 +2,7 @@ import Scheduler from "./Scheduler";
 import {newId, EdgeError, LoadEvent} from "./Shared";
 /** Loads linked resources.  By default uses the global fetch function if any.
 This behavior can be overridden by adding an event listener to
-the load even and calling 'setValue' with the Vector or Graph
+the load event and calling 'setValue' with the Vector or Graph
 requested. */
 export default class Loader<T> {
     cache: {
@@ -20,8 +20,7 @@ export default class Loader<T> {
     }
     async load(url: string): Promise<T> {
         const scheduler = this.scheduler;
-        const cache = this.cache
-        ;
+        const cache = this.cache;
         scheduler.logger.debug("Loader: loading: " + url);
         const ev = {
             time: Date.now(),
@@ -53,6 +52,6 @@ export default class Loader<T> {
         scheduler.logger.debug("Loader: loading resource via fetch: " + url);
         const data = await fetch(url);
         cache[url] = await data.json();
-        return cache[url]
+        return cache[url];
     }
 }
