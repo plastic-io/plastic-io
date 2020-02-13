@@ -12,15 +12,12 @@ jobs:
       - uses: actions/checkout@v2
       - uses: peaceiris/actions-gh-pages@v3
       - uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
-          publish_dir: ./public
-        run: npm install
-        run: npm run build
-        run: npm test
-        run: npm run build-docs
-
+          with:
+            node-version: '10.x'
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+      - run: npm run build-docs
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
         with:
