@@ -2,7 +2,7 @@
     "name": "@plastic-io/plastic-io",
     "license": "BSD-3-Clause",
     "author": "TonyGermaneri@gmail.com",
-    "version": "0.1.1",
+    "version": "1.0.0",
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/plastic-io.js",
     "types": "./dist/plastic-io.d.ts",
