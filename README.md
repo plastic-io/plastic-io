@@ -2,7 +2,13 @@
 
 ## Graph scheduling engine.
 
+![Tests](https://github.com/plastic-io/plastic-io/workflows/Tests/badge.svg)
+
 This program can execute graphs written in the application/json+plastic-io schema.
+
+[Documentation](https://plastic-io.github.io/plastic-io/)
+
+[Repo](https://github.com/plastic-io/plastic-io)
 
 ## Major engine features
 
