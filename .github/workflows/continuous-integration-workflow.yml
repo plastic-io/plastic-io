@@ -19,12 +19,13 @@ jobs:
         run: |
           npm install
           npm run build
+      # docs must come first, tests write to a sub dir
+      - name: Build docs
+        run: npm run build-docs
       - name: Tests
         run: npm test
       - name: Lint
         run: npm run lint
-      - name: Build docs
-        run: npm run build-docs
       - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
         with:
