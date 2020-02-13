@@ -1,0 +1,16 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "jsRules": {},
+    "rules": {
+        "@typescript-eslint/no-explicit-any": false
+    },
+    "linterOptions": {
+        "exclude": [
+            "**/*.js"
+        ]
+    },
+    "rulesDirectory": []
+}

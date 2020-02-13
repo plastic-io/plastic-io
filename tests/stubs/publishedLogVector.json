@@ -1,0 +1,12 @@
+{
+    "id": "2",
+    "edges": [],
+    "version": 0,
+    "graphId": "0",
+    "url": "",
+    "data": "",
+    "properties": {},
+    "template": {
+        "set": "console.info(value);console.warn(data)"
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "vectors": [
+        {
+            "id": "1",
+            "edges": [
+                {
+                    "field": "proxy"
+                }
+            ],
+            "version": 0,
+            "graphId": "0",
+            "url": "index",
+            "data": "",
+            "properties": {},
+            "template": {
+                "set": "edges.proxy = 1;"
+            }
+        }
+    ],
+    "id": "0",
+    "version": 0,
+    "properties": {
+        "name": "",
+        "description": "",
+        "createdBy": "",
+        "createdOn": 0,
+        "lastUpdate": 0,
+        "exportable": false,
+        "height": 1,
+        "width": 1
+    }
+}
