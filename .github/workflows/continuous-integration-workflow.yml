@@ -13,13 +13,17 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       - 
-        name: Build
+        name: Install Node
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
+      -
         run: npm install
+      -
         run: npm run build
+      -
         run: npm test
+      -
         run: npm run build-docs
       - 
         name: Deploy Docs
