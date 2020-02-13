@@ -28,7 +28,7 @@ export default class Scheduler {
     vectorPath: string;
     /** Holds events in the event bus */
     events: {
-        [key: string]: Function[];
+        [key: string]: Function[]; // tslint:disable-line
     };
     /** Plastic-io graph scheduler runtime. */
     constructor(graph: Graph, context: object = {}, state: object = {}, logger: Logger = nullLogger) {
@@ -50,7 +50,7 @@ export default class Scheduler {
         this.logger.debug("Startup parameters set");
     }
     /** Removes an event listener */
-    removeEventListener(eventName: string, listener: Function): void {
+    removeEventListener(eventName: string, listener: () => void): void {
         this.logger.debug("Scheduler: Remove event " + eventName);
         if (!this.events[eventName]) {
             return;
@@ -62,7 +62,7 @@ export default class Scheduler {
         this.events[eventName].splice(idx, 1);
     }
     /** Adds an event listener */
-    addEventListener(eventName: string, listener: Function): void {
+    addEventListener(eventName: string, listener: () => void): void {
         this.logger.debug("Scheduler: Add event " + eventName);
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(listener);
@@ -91,8 +91,8 @@ export default class Scheduler {
             id: newId(),
         } as SchedulerEvent);
         const pattern = new RegExp(url);
-        const vector = this.graph.vectors.find((vector: Vector) => {
-            return pattern.test(vector.url);
+        const vector = this.graph.vectors.find((vec: Vector) => {
+            return pattern.test(vec.url);
         }) as Vector;
         if (!vector && url) {
             this.logger.warn("Scheduler: Cannot find URL " + url);

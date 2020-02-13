@@ -1,9 +1,11 @@
 import Scheduler from "./Scheduler";
 import {newId, EdgeError, LoadEvent} from "./Shared";
-/** Loads linked resources.  By default uses the global fetch function if any.
-This behavior can be overridden by adding an event listener to
-the load event and calling 'setValue' with the Vector or Graph
-requested. */
+/**
+ * Loads linked resources.  By default uses the global fetch function if any.
+ * This behavior can be overridden by adding an event listener to
+ * the load event and calling 'setValue' with the Vector or Graph
+ * requested.
+ */
 export default class Loader<T> {
     cache: {
         [key: string]: T;

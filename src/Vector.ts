@@ -8,7 +8,7 @@ export default interface Vector {
     id: string;
     linkedGraph?: LinkedGraph;
     linkedVector?: LinkedVector;
-    /** Output edges on the vector*/
+    /** Output edges on the vector */
     edges: Edge[];
     /** Used along with graphId to locate vectors in linked resources */
     version: number;
@@ -16,12 +16,16 @@ export default interface Vector {
     graphId: string;
     /** The URL to this vector, combined with the vector's graphId */
     url: string;
-    /** This property holds domain specific non-volitalie data associated
-    with this vector instance */
+    /**
+     * This property holds domain specific non-volitalie data associated
+     * with this vector instance
+     */
     data: any; // eslint-disable-line
-    /** This property contains non-volitalie meta information about the vector,
-    such as placement in the UI, executable code, and other meta properties
-    specific to the domain of the vector */
+    /**
+     * This property contains non-volitalie meta information about the vector,
+     * such as placement in the UI, executable code, and other meta properties
+     * specific to the domain of the vector
+     */
     properties: object;
     /** Vector template.  Defines UX and runtime code. */
     template: VectorTemplate;
@@ -136,7 +140,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     log.debug("Vector: vector.edge.length " + vect.edges.length);
     vect.edges.forEach((edge: Edge) => {
         Object.defineProperty(edges, edge.field, {
-            set: async (val: any) => {
+            set: async (setterVal: any) => {
                 async function setter(val: any): Promise<void> {
                     log.debug("Vector: Edge setter invoked. field " + edge.field + ", vector.id " + vect.id);
                     for (const connector of edge.connectors) {
@@ -162,7 +166,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                     }
                 }
                 try {
-                    await setter(val);
+                    await setter(setterVal);
                 } catch(err) {
                     const er = new Error("Vector: Edge setter error. field " + edge.field + ", vector.id " + vect.id + ": " + err);
                     log.error(er.stack);
