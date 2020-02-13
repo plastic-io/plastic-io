@@ -9,24 +9,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - 
-        name: Checkout
+      - name: Checkout
         uses: actions/checkout@v2
-      - 
-        name: Install Node
+      - name: Install Node
         uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      -
-        run: npm install
-      -
-        run: npm run build
-      -
-        run: npm test
-      -
-        run: npm run build-docs
-      - 
-        name: Deploy Docs
+      - name: Build
+        run: |
+          npm install
+          npm run build
+          npm test
+          npm run build-docs
+      - name: Deploy Docs
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
