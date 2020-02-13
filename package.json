@@ -2,6 +2,7 @@
     "name": "@plastic-io/plastic-io",
     "license": "BSD-3-Clause",
     "author": "TonyGermaneri@gmail.com",
+    "private": false,
     "version": "1.0.0",
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/Scheduler.js",
