@@ -8,7 +8,10 @@ This program can execute graphs written in the application/json+plastic-io schem
 
 [Documentation](https://plastic-io.github.io/plastic-io/)
 
+[Test Coverage](https://plastic-io.github.io/plastic-io/coverage/lcov-report/)
+
 [Repo](https://github.com/plastic-io/plastic-io)
+
 
 ## Major engine features
 

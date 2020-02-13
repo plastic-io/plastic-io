@@ -1,4 +1,4 @@
-name: Tests
+name: CI/CD
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -22,16 +22,17 @@ jobs:
       # docs must come first, tests write to a sub dir
       - name: Build docs
         run: npm run build-docs
-      - name: Tests
-        run: npm test
       - name: Lint
         run: npm run lint
-      - name: Deploy Docs
+      - name: Tests
+        run: npm test
+  publish:
+      - name: Publish Documentation
         uses: peaceiris/actions-gh-pages@v3
         with:
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./docs
-      - name: Publish
+      - name: Publish NPM Module
         uses: JS-DevTools/npm-publish@v1
         with:
           check-version: false
