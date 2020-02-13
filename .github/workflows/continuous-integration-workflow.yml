@@ -19,7 +19,7 @@ jobs:
         run: |
           npm install
           npm run build
-      - name: Test
+      - name: Tests
         run: npm test
       - name: Build docs
         run: npm run build-docs
