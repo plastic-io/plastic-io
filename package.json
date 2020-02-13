@@ -4,12 +4,15 @@
     "author": "TonyGermaneri@gmail.com",
     "version": "1.0.0",
     "description": "JavaScript graph programming lanague.",
-    "main": "./dist/plastic-io.js",
-    "types": "./dist/plastic-io.d.ts",
+    "main": "./dist/Scheduler.js",
+    "types": "./dist/Scheduler.d.ts",
+    "flies": [
+        "./dist/**/*"
+    ],
     "scripts": {
         "build": "./node_modules/.bin/tsc",
         "build-watch": "npm run build && nodemon -e ts --watch src --exec npm run build",
-        "lint": "./node_modules/.bin/eslint ./src/*.ts",
+        "lint": "./node_modules/.bin/tslint -p tsconfig.json",
         "test": "./node_modules/.bin/jest",
         "test-watch": "nodemon -e ts --watch src --exec npm run test",
         "build-docs": "./node_modules/.bin/typedoc"
@@ -33,7 +36,6 @@
         "babel-jest": "^25.1.0",
         "eslint": "^6.8.0",
         "jest": "^25.1.0",
-        "meriyah": "^1.9.7",
         "nodemon": "^2.0.2",
         "ts-jest": "^25.2.0",
         "tslint": "^6.0.0",
@@ -41,7 +43,7 @@
         "typescript": "^3.7.5"
     },
     "dependencies": {
-        "acorn": "^7.1.0",
+        "meriyah": "^1.9.7",
         "escodegen": "^1.14.1"
     }
 }

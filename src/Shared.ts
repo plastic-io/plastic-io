@@ -1,9 +1,11 @@
 import Vector from "./Vector";
-/** Occurs when a linked vector or graph are loaded.
-The fetch function in the global scope is used to fetch URLs.
-This behavior can be overridden by adding an event listener to
-the load even and calling 'setValue' with the Vector or Graph
-requested. */
+/**
+ * Occurs when a linked vector or graph are loaded.
+ * The fetch function in the global scope is used to fetch URLs.
+ * This behavior can be overridden by adding an event listener to
+ * the load even and calling 'setValue' with the Vector or Graph
+ * requested.
+ */
 export interface LoadEvent extends SchedulerEvent {
     /** The unique UUID of the event */
     id: string;
@@ -12,8 +14,9 @@ export interface LoadEvent extends SchedulerEvent {
     /** How long the event took */
     duration?: number;
     /** Calling the setValue function will set the linked graph or vector and
-    stop the default global fetch function from being called*/
-    setValue: Function;
+     * stop the default global fetch function from being called
+     */
+    setValue: Function; // tslint:disable-line
 }
 /** Connects two vector edges together */
 export interface Connector {
@@ -35,10 +38,12 @@ export interface FieldMap {
     /** The edge name this field mapping belong to */
     field: string;
 }
-/** Used to host vector template data.  Unless extended to contain
-other templates, for example Vue or React templates, this interface will only
-contain the main set property that hold ESNEXT source code that runs
-when the vector's setter is set */
+/**
+ * Used to host vector template data.  Unless extended to contain
+ * other templates, for example Vue or React templates, this interface will only
+ * contain the main set property that hold ESNEXT source code that runs
+ * when the vector's setter is set
+ */
 export interface VectorTemplate {
     set: string;
 }
@@ -97,23 +102,31 @@ export interface VectorInterface {
     cache: object;
     /** The graph that this vector belongs to */
     graph: Graph;
-    /** Data associated with this vector.  Data can be any type, it depends on
-    the vector author's purpose for the vector.  Data is meant to be
-    non volatile information related to the domain of this vector.*/
+    /**
+     * Data associated with this vector.  Data can be any type, it depends on
+     * the vector author's purpose for the vector.  Data is meant to be
+     * non volatile information related to the domain of this vector.
+     */
     data: any;
-    /** Properties associated with this vector.  Properties is used by
-    the graph domain user interface or other non volatile graph or vector
-    domain interfaces. */
+    /**
+     * Properties associated with this vector.  Properties is used by
+     * the graph domain user interface or other non volatile graph or vector
+     * domain interfaces.
+     */
     properties: object;
 }
-/** This event is dispatched after vector set code has been executed.
-The global return value for the vector set code can be found here.*/
+/**
+ * This event is dispatched after vector set code has been executed.
+ * The global return value for the vector set code can be found here.
+ */
 export interface VectorSetEvent extends SchedulerEvent {
     /** If present, an error occurred and this is the error. */
     err?: Error;
-    /** Return value if any.  This requires the set function
-    to return in the global scope.  This has no impact on graph execution,
-    the value does not connect to other vectors. */
+    /**
+     * Return value if any.  This requires the set function
+     * to return in the global scope.  This has no impact on graph execution,
+     * the value does not connect to other vectors.
+     */
     return: any;
     /** The vector interface passed to the set function. */
     vectorInterface: VectorInterface;
@@ -133,20 +146,21 @@ export const nullLogger: Logger = {
 /** To see the log output of the Scheduler, attach a W3C standard logger to the scheduler constructor */
 export interface Logger {
     /** Not used much */
-    log: Function;
+    log: Function; // tslint:disable-line
     /** Maybe important info */
-    warn: Function;
+    warn: Function; // tslint:disable-line
     /** Really unimportant stuff, unless everything is breaking, then it's really important. */
-    debug: Function;
+    debug: Function; // tslint:disable-line
     /** Mildly interesting data, not used much. */
-    info: Function;
+    info: Function; // tslint:disable-line
     /** Always critical to see when failures happen.  This is also cloned in the 'error' event. */
-    error: Function;
+    error: Function; // tslint:disable-line
 }
 /** Creates a new v4 UUID */
 export function newId(): string {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
-        var r = Math.random() * 16 | 0, v = c == "x" ? r : (r & 0x3 | 0x8); // eslint-disable-line
+        // tslint:disable-next-line
+        var r = Math.random() * 16 | 0, v = c == "x" ? r : (r & 0x3 | 0x8); // eslint-disable-line 
         return v.toString(16);
     });
 }

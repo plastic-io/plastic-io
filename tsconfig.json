@@ -14,7 +14,6 @@
         "lib": ["es2016", "dom", "es5"]
     },
     "include": [
-        "./index.d.ts",
-        "./src/**/*"
+        "./index.d.ts"
     ],
 }
