@@ -3,7 +3,7 @@
     "license": "BSD-3-Clause",
     "author": "TonyGermaneri@gmail.com",
     "private": false,
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/Scheduler.js",
     "types": "./dist/Scheduler.d.ts",
@@ -29,7 +29,6 @@
         "@babel/preset-typescript": "^7.8.3",
         "@babel/types": "^7.8.3",
         "@types/acorn": "^4.0.5",
-        "@types/escodegen": "0.0.6",
         "@types/jest": "^25.1.1",
         "@types/node": "^12.7.4",
         "@typescript-eslint/eslint-plugin": "^2.19.0",
@@ -45,6 +44,7 @@
     },
     "dependencies": {
         "meriyah": "^1.9.7",
-        "escodegen": "^1.14.1"
+        "escodegen": "^1.14.1",
+        "@types/escodegen": "0.0.6"
     }
 }
