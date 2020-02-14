@@ -7,8 +7,10 @@
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/Scheduler.js",
     "types": "./dist/Scheduler.d.ts",
-    "flies": [
-        "./dist/**/*"
+    "files": [
+        "./dist/**/*",
+        "LICENSE",
+        "README.md"
     ],
     "scripts": {
         "build": "./node_modules/.bin/tsc",
