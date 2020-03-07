@@ -27,6 +27,7 @@ export default class Loader<T> {
         const ev = {
             time: Date.now(),
             id: newId(),
+            url,
             setValue(val: T) {
                 scheduler.logger.debug("Loader: loading resource via load event: " + url);
                 cache[url] = val;
@@ -47,6 +48,7 @@ export default class Loader<T> {
                 id: newId(),
                 time: Date.now(),
                 err: er,
+                url,
                 message: er.toString(),
             } as EdgeError);
             throw er;

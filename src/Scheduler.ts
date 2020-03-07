@@ -87,6 +87,7 @@ export default class Scheduler {
         this.logger.debug("Scheduler: Set URL " + url);
         const start = Date.now();
         this.dispatchEvent("begin", {
+            url,
             time: start,
             id: newId(),
         } as SchedulerEvent);
@@ -97,6 +98,7 @@ export default class Scheduler {
         if (!vector && url) {
             this.logger.warn("Scheduler: Cannot find URL " + url);
             this.dispatchEvent("warning", {
+                url,
                 time: Date.now(),
                 id: newId(),
                 message: "Cannot find vector at the specified URL.",
@@ -107,6 +109,7 @@ export default class Scheduler {
             await execute(this, this.graph, vector, "$url", value);
         }
         this.dispatchEvent("end", {
+            url,
             time: Date.now(),
             id: newId(),
             duration: Date.now() - start,
