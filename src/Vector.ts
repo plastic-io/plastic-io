@@ -68,6 +68,8 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 time: Date.now(),
                 err,
                 message: err.toString(),
+                vectorId: vector.id,
+                graphId: graph.id,
             } as EdgeError);
         } else {
             vector.linkedVector.loaded = true;
@@ -88,6 +90,8 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 time: Date.now(),
                 err,
                 message: err.toString(),
+                vectorId: vector.id,
+                graphId: graph.id,
             } as EdgeError);
         } else {
             vect.linkedGraph.loaded = true;
@@ -161,6 +165,10 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                                 time: Date.now(),
                                 err,
                                 message: err.toString(),
+                                edgeField: edge.field,
+                                connectorId: connector.id,
+                                vectorId: vect.id,
+                                graphId: graph.id,
                             } as EdgeError);
                         }
                     }
@@ -175,6 +183,9 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                         time: Date.now(),
                         err: er,
                         message: er.toString(),
+                        edgeField: edge.field,
+                        vectorId: vect.id,
+                        graphId: graph.id,
                     } as EdgeError);
                 }
             }
@@ -208,6 +219,9 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 time: Date.now(),
                 err,
                 message: err.toString(),
+                vectorId: vect.id,
+                graphId: graph.id,
+                field,
             } as EdgeError);
         }
         scheduler.dispatchEvent("set", {
@@ -225,6 +239,9 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             time: Date.now(),
             err,
             message: err.toString(),
+            vectorId: vect.id,
+            graphId: graph.id,
+            field,
         } as EdgeError);
     }
 }

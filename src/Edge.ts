@@ -14,6 +14,10 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     scheduler.dispatchEvent("beginedge", {
         time: start,
         id: newId(),
+        vectorId: vector.id,
+        graphId: graph.id,
+        field,
+        value,
     } as SchedulerEvent);
     scheduler.logger.debug("Edge: Vector.execute: vector.id:field " + vector.id + ":" + field);
     function end(): void {
@@ -22,6 +26,10 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             time: now,
             id: newId(),
             duration: now - start,
+            vectorId: vector.id,
+            graphId: graph.id,
+            field,
+            value,
         } as SchedulerEvent);
     }
     vectorExecute(scheduler, graph, vector, field, value)
@@ -34,6 +42,10 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             time: Date.now(),
             err: er,
             message: er.toString(),
+            vectorId: vector.id,
+            graphId: graph.id,
+            field,
+            value,
         } as EdgeError);
         end();
     });

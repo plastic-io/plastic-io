@@ -154,6 +154,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
     it("Should load a graph via the event emitter's load method.", (done) => {
         const scheduler = new Scheduler(stubs.linkedLogVector, {}, {}, stubs.console);
         scheduler.addEventListener("load", (e) => {
+            expect(e.url).toEqual("artifacts/vectors/1234.0");
             e.setValue(stubs.publishedLogVector);
         });
         scheduler.url("index");
