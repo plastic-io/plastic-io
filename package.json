@@ -3,7 +3,7 @@
     "license": "BSD-3-Clause",
     "author": "TonyGermaneri@gmail.com",
     "private": false,
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/Scheduler.js",
     "types": "./dist/Scheduler.d.ts",
