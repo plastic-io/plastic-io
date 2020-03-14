@@ -1,6 +1,6 @@
 /* global describe it expect jest beforeEach require global setTimeout */
 const fetchMock = require("../mocks/fetch.js"); // eslint-disable-line
-const Scheduler = require("../../dist/Scheduler.js").default;
+const Scheduler = require("../../dist/index.js").default;
 const stubs = {};
 function linkStubs() { // eslint-disable-line
     ["emptyGraph", "singleLogVector", "proxyToLog", "linkedGraph", "linkedCycleInner",

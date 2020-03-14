@@ -1,6 +1,6 @@
 import Vector from "./Vector";
 import {execute} from "./Edge";
-import {Graph, newId, Logger, nullLogger, SchedulerEvent, ExecutionResult, Warning} from "./Shared";
+import {LoadEvent, Graph, newId, Logger, nullLogger, SchedulerEvent, ExecutionResult, Warning, EdgeError, VectorSetEvent} from "./Shared";
 import Loader from "./Loader";
 /** Graph execution engine */
 export default class Scheduler {
@@ -62,7 +62,7 @@ export default class Scheduler {
         this.events[eventName].splice(idx, 1);
     }
     /** Adds an event listener */
-    addEventListener(eventName: string, listener: () => void): void {
+    addEventListener(eventName: string, listener: (eventData: SchedulerEvent | LoadEvent | EdgeError | VectorSetEvent | Error | Warning) => void): void {
         this.logger.debug("Scheduler: Add event " + eventName);
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(listener);
