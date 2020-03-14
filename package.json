@@ -5,8 +5,8 @@
     "private": false,
     "version": "1.0.4",
     "description": "JavaScript graph programming lanague.",
-    "main": "./dist/Scheduler.js",
-    "types": "./dist/Scheduler.d.ts",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "files": [
         "dist/*",
         "LICENSE",

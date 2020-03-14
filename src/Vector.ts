@@ -26,7 +26,7 @@ export default interface Vector {
      * such as placement in the UI, executable code, and other meta properties
      * specific to the domain of the vector
      */
-    properties: object;
+    properties: any;
     /** Vector template.  Defines UX and runtime code. */
     template: VectorTemplate;
 }
