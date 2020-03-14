@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1583620788959" clover="3.2.0">
-  <project timestamp="1583620788959" name="All files">
-    <metrics statements="195" coveredstatements="195" conditionals="69" coveredconditionals="69" methods="33" coveredmethods="33" elements="297" coveredelements="297" complexity="0" loc="195" ncloc="195" packages="1" files="5" classes="5"/>
+<coverage generated="1584179217612" clover="3.2.0">
+  <project timestamp="1584179217612" name="All files">
+    <metrics statements="201" coveredstatements="201" conditionals="69" coveredconditionals="69" methods="33" coveredmethods="33" elements="303" coveredelements="303" complexity="0" loc="201" ncloc="201" packages="1" files="6" classes="6"/>
     <file name="Edge.ts" path="/home/runner/work/plastic-io/plastic-io/src/Edge.ts">
       <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
       <line num="1" count="1" type="stmt"/>
@@ -112,13 +112,13 @@
     </file>
     <file name="Shared.ts" path="/home/runner/work/plastic-io/plastic-io/src/Shared.ts">
       <metrics statements="7" coveredstatements="7" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
-      <line num="135" count="1" type="stmt"/>
-      <line num="136" count="447" type="stmt"/>
-      <line num="139" count="1" type="stmt"/>
-      <line num="160" count="1" type="stmt"/>
-      <line num="161" count="198" type="stmt"/>
-      <line num="163" count="6138" type="cond" truecount="2" falsecount="0"/>
-      <line num="164" count="6138" type="stmt"/>
+      <line num="147" count="1" type="stmt"/>
+      <line num="148" count="447" type="stmt"/>
+      <line num="151" count="1" type="stmt"/>
+      <line num="172" count="1" type="stmt"/>
+      <line num="173" count="198" type="stmt"/>
+      <line num="175" count="6138" type="cond" truecount="2" falsecount="0"/>
+      <line num="176" count="6138" type="stmt"/>
     </file>
     <file name="Vector.ts" path="/home/runner/work/plastic-io/plastic-io/src/Vector.ts">
       <metrics statements="89" coveredstatements="89" conditionals="41" coveredconditionals="41" methods="12" coveredmethods="12"/>
@@ -211,6 +211,15 @@
       <line num="235" count="2" type="stmt"/>
       <line num="236" count="2" type="stmt"/>
       <line num="237" count="2" type="stmt"/>
+    </file>
+    <file name="index.ts" path="/home/runner/work/plastic-io/plastic-io/src/index.ts">
+      <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <line num="4" count="1" type="stmt"/>
+      <line num="22" count="1" type="stmt"/>
+      <line num="25" count="1" type="stmt"/>
+      <line num="26" count="1" type="stmt"/>
+      <line num="28" count="1" type="stmt"/>
+      <line num="41" count="1" type="stmt"/>
     </file>
   </project>
 </coverage>
