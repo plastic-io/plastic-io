@@ -14,10 +14,8 @@
     ],
     "scripts": {
         "build": "./node_modules/.bin/tsc",
-        "build-watch": "npm run build && nodemon -e ts --watch src --exec npm run build",
         "lint": "./node_modules/.bin/tslint -p tsconfig.json",
         "test": "./node_modules/.bin/jest",
-        "test-watch": "nodemon -e ts --watch src --exec npm run test",
         "build-docs": "./node_modules/.bin/typedoc"
     },
     "repository": {
@@ -38,7 +36,6 @@
         "babel-jest": "^25.1.0",
         "eslint": "^6.8.0",
         "jest": "^25.1.0",
-        "nodemon": "^2.0.2",
         "ts-jest": "^25.2.1",
         "tslint": "^6.1.0",
         "typedoc": "^0.16.11",
