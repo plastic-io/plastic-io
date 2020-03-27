@@ -9,7 +9,8 @@
     },
     "linterOptions": {
         "exclude": [
-            "**/*.js"
+            "**/*.js",
+            "./node_modules/*"
         ]
     },
     "rulesDirectory": []
