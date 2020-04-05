@@ -10,14 +10,15 @@ export default interface Edge {
 }
 /** Executes a given edge.  Edges are always inputs (LTR) */
 export async function execute(scheduler: Scheduler, graph: Graph,
-        vector: Vector, field: string, value: any, currentVector: Vector): Promise<any> {
+        vector: Vector, field: string, value: any, currentVector: Vector | null): Promise<any> {
+    const currentVectorId = currentVector ? currentVector.id : null;
     const start = Date.now();
     scheduler.dispatchEvent("beginedge", {
         time: start,
         id: newId(),
         vectorId: vector.id,
         graphId: graph.id,
-        currentVectorId: currentVector.id,
+        currentVectorId,
         field,
         value,
     } as SchedulerEvent);
@@ -30,7 +31,7 @@ export async function execute(scheduler: Scheduler, graph: Graph,
             duration: now - start,
             vectorId: vector.id,
             graphId: graph.id,
-            currentVectorId: currentVector.id,
+            currentVectorId,
             field,
             value,
         } as SchedulerEvent);
@@ -46,7 +47,7 @@ export async function execute(scheduler: Scheduler, graph: Graph,
             err: er,
             message: er.toString(),
             vectorId: vector.id,
-            currentVectorId: currentVector.id,
+            currentVectorId,
             graphId: graph.id,
             field,
             value,
