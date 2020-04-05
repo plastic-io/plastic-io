@@ -156,7 +156,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                         });
                         if (vectorNext) {
                             log.debug("Vector: Edge.execute vectorNext.id " + vectorNext.id + " vectorNext.graphId " + vectorNext.graphId);
-                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val);
+                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val, vect);
                         } else {
                             const err = new Error("Connector refers to a vector edge that does not exist.  Connector.id: " + connector.id);
                             log.error(err.stack);
