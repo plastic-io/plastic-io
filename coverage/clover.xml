@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1585284734930" clover="3.2.0">
-  <project timestamp="1585284734930" name="All files">
-    <metrics statements="201" coveredstatements="201" conditionals="69" coveredconditionals="69" methods="33" coveredmethods="33" elements="303" coveredelements="303" complexity="0" loc="201" ncloc="201" packages="1" files="6" classes="6"/>
+<coverage generated="1586072203985" clover="3.2.0">
+  <project timestamp="1586072203986" name="All files">
+    <metrics statements="202" coveredstatements="202" conditionals="71" coveredconditionals="71" methods="33" coveredmethods="33" elements="306" coveredelements="306" complexity="0" loc="202" ncloc="202" packages="1" files="6" classes="6"/>
     <file name="Edge.ts" path="/home/runner/work/plastic-io/plastic-io/src/Edge.ts">
-      <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
+      <metrics statements="14" coveredstatements="14" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
       <line num="1" count="1" type="stmt"/>
       <line num="2" count="1" type="stmt"/>
       <line num="12" count="1" type="stmt"/>
-      <line num="13" count="40" type="stmt"/>
-      <line num="14" count="40" type="stmt"/>
-      <line num="22" count="40" type="stmt"/>
-      <line num="24" count="40" type="stmt"/>
+      <line num="14" count="40" type="cond" truecount="2" falsecount="0"/>
+      <line num="15" count="40" type="stmt"/>
+      <line num="16" count="40" type="stmt"/>
       <line num="25" count="40" type="stmt"/>
-      <line num="35" count="40" type="stmt"/>
-      <line num="38" count="6" type="stmt"/>
-      <line num="39" count="6" type="stmt"/>
-      <line num="40" count="6" type="stmt"/>
-      <line num="50" count="6" type="stmt"/>
+      <line num="27" count="40" type="stmt"/>
+      <line num="28" count="40" type="stmt"/>
+      <line num="39" count="40" type="stmt"/>
+      <line num="42" count="6" type="stmt"/>
+      <line num="43" count="6" type="stmt"/>
+      <line num="44" count="6" type="stmt"/>
+      <line num="55" count="6" type="stmt"/>
     </file>
     <file name="Loader.ts" path="/home/runner/work/plastic-io/plastic-io/src/Loader.ts">
       <metrics statements="29" coveredstatements="29" conditionals="4" coveredconditionals="4" methods="6" coveredmethods="6"/>
