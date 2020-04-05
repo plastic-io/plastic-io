@@ -106,7 +106,7 @@ export default class Scheduler {
         }
         if (vector) {
             this.logger.info("Executing vector at URL " + url);
-            await execute(this, this.graph, vector, "$url", value);
+            await execute(this, this.graph, vector, "$url", value, null);
         }
         this.dispatchEvent("end", {
             url,
