@@ -57,6 +57,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     log.debug("Vector: Begin execute vector.id " + vector.id + ", field " + field);
     // load linked resources JIT
     let vect = vector;
+    const linkedEdges: any[] = [];
     if (vector.linkedVector && !vector.linkedVector.loaded) {
         log.debug("Vector: Load linked vector " + vector.linkedVector.id + " for vector.id: " + vector.id);
         vector.linkedVector.vector = await scheduler.vectorLoader.load(scheduler.getVectorPath(vector.linkedVector.id, vector.linkedVector.version));
@@ -122,6 +123,11 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                             log.debug("Vector: No linked edges found for field: " + JSON.stringify(output) + " id: " + output.id);
                             return;
                         }
+                        linkedEdges.push({
+                            linkedEdge,
+                            hostVectorId: vect.id,
+                            vectorId: v.id,
+                        });
                         log.debug("Vector: linkedEdge.connectors count " + linkedEdge.connectors.length);
                         // replace inner graph outputs with host vector
                         edg.connectors = [
@@ -164,7 +170,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                         });
                         if (vectorNext) {
                             log.debug("Vector: Edge.execute vectorNext.id " + vectorNext.id + " vectorNext.graphId " + vectorNext.graphId);
-                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val, vect);
+                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val, vect, linkedEdges);
                         } else {
                             const err = new Error("Connector refers to a vector edge that does not exist.  Connector.id: " + connector.id);
                             log.error(err.stack);
