@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1586509921256" clover="3.2.0">
-  <project timestamp="1586509921256" name="All files">
+<coverage generated="1586510037146" clover="3.2.0">
+  <project timestamp="1586510037147" name="All files">
     <metrics statements="207" coveredstatements="207" conditionals="79" coveredconditionals="79" methods="33" coveredmethods="33" elements="319" coveredelements="319" complexity="0" loc="207" ncloc="207" packages="1" files="6" classes="6"/>
     <file name="Edge.ts" path="/home/runner/work/plastic-io/plastic-io/src/Edge.ts">
       <metrics statements="14" coveredstatements="14" conditionals="8" coveredconditionals="8" methods="3" coveredmethods="3"/>
