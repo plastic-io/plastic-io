@@ -57,6 +57,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     log.debug("Vector: Begin execute vector.id " + vector.id + ", field " + field);
     // load linked resources JIT
     let vect = vector;
+    const linkedEdges: any[] = [];
     if (vector.linkedVector && !vector.linkedVector.loaded) {
         log.debug("Vector: Load linked vector " + vector.linkedVector.id + " for vector.id: " + vector.id);
         vector.linkedVector.vector = await scheduler.vectorLoader.load(scheduler.getVectorPath(vector.linkedVector.id, vector.linkedVector.version));
@@ -79,9 +80,12 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             vect.properties = vector.properties;
         }
     }
-    if (vect.linkedGraph && !vect.linkedGraph.loaded) {
-        log.debug("Vector: Load linked graph for vector.id " + vector.id);
-        vect.linkedGraph.graph = await scheduler.graphLoader.load(scheduler.getGraphPath(vect.linkedGraph.id, vect.linkedGraph.version));
+    if (vect.linkedGraph) {
+        if (!vect.linkedGraph.loaded) {
+            log.debug("Vector: Load linked graph for vector.id " + vector.id);
+            vect.linkedGraph.graph = await scheduler.graphLoader.load(scheduler.getGraphPath(vect.linkedGraph.id, vect.linkedGraph.version));
+            vect.linkedGraph.loaded = true;
+        }
         if (vector.linkedGraph && !vector.linkedGraph.graph) {
             const err = new Error("Vector: Critical Error: Linked graph not found on vector.id: " + vector.id);
             log.error(err.stack);
@@ -94,7 +98,6 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 graphId: graph.id,
             } as EdgeError);
         } else {
-            vect.linkedGraph.loaded = true;
             // use the linked graph for vectorNext search
             graph = vect.linkedGraph.graph;
             // ----- OUTPUTS
@@ -113,11 +116,17 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                             return edge.field === output.field && output.id === v.id;
                         });
                         if (!linkedEdge) {
+                            log.debug("Vector: No linked edges found for field: " + JSON.stringify(output) + " id: " + output.id);
                             return;
                         }
+                        linkedEdges.push({
+                            linkedEdge,
+                            hostVectorId: vect.id,
+                            vectorId: v.id,
+                        });
                         log.debug("Vector: linkedEdge.connectors count " + linkedEdge.connectors.length);
                         // replace inner graph outputs with host vector
-                        edg.connectors = edg.connectors = [
+                        edg.connectors = [
                             ...edg.connectors,
                             ...linkedEdge.connectors,
                         ];
@@ -146,7 +155,8 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
         Object.defineProperty(edges, edge.field, {
             set: async (setterVal: any) => {
                 async function setter(val: any): Promise<void> {
-                    log.debug("Vector: Edge setter invoked. field " + edge.field + ", vector.id " + vect.id);
+                    log.debug("Vector: Edge setter invoked. field " + edge.field + ", edge.connectors.length "
+                        + edge.connectors.length + ", vector.id " + vect.id, " graph.id", graph.id);
                     for (const connector of edge.connectors) {
                         if (connector.graphId !== graph.id || connector.version !== graph.version) {
                             graph = await scheduler.graphLoader.load(scheduler.getGraphPath(connector.graphId, connector.version));
@@ -156,7 +166,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                         });
                         if (vectorNext) {
                             log.debug("Vector: Edge.execute vectorNext.id " + vectorNext.id + " vectorNext.graphId " + vectorNext.graphId);
-                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val, vect);
+                            await edgeExecute(scheduler, graph, vectorNext, connector.field, val, vect, linkedEdges);
                         } else {
                             const err = new Error("Connector refers to a vector edge that does not exist.  Connector.id: " + connector.id);
                             log.error(err.stack);
