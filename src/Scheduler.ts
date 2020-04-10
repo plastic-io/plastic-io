@@ -83,7 +83,7 @@ export default class Scheduler {
         return this.graphPath.replace("{id}", id).replace("{version}", version.toString());
     }
     /** Navigate to a given vector via vector URL */
-    async url(url: string, value: any, field = "$url", currentVector: Vector, graph?: Graph): Promise<ExecutionResult> {
+    async url(url: string, value: any, field: string, currentVector: Vector, graph?: Graph): Promise<ExecutionResult> {
         graph = graph || this.graph;
         this.logger.debug("Scheduler: Set URL " + url);
         const start = Date.now();

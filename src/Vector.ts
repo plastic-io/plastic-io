@@ -83,11 +83,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     if (vect.linkedGraph) {
         if (!vect.linkedGraph.loaded) {
             log.debug("Vector: Load linked graph for vector.id " + vector.id);
-            try {
-                vect.linkedGraph.graph = await scheduler.graphLoader.load(scheduler.getGraphPath(vect.linkedGraph.id, vect.linkedGraph.version));
-            } catch (err) {
-                throw new Error("Vector: linkedGraph load: Cannot load linked graph: " + err);
-            }
+            vect.linkedGraph.graph = await scheduler.graphLoader.load(scheduler.getGraphPath(vect.linkedGraph.id, vect.linkedGraph.version));
             vect.linkedGraph.loaded = true;
         }
         if (vector.linkedGraph && !vector.linkedGraph.graph) {
