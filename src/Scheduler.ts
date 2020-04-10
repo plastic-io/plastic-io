@@ -83,7 +83,8 @@ export default class Scheduler {
         return this.graphPath.replace("{id}", id).replace("{version}", version.toString());
     }
     /** Navigate to a given vector via vector URL */
-    async url(url: string, value: any): Promise<ExecutionResult> {
+    async url(url: string, value: any, field = "$url", currentVector: Vector, graph?: Graph): Promise<ExecutionResult> {
+        graph = graph || this.graph;
         this.logger.debug("Scheduler: Set URL " + url);
         const start = Date.now();
         this.dispatchEvent("begin", {
@@ -92,7 +93,7 @@ export default class Scheduler {
             id: newId(),
         } as SchedulerEvent);
         const pattern = new RegExp(url);
-        const vector = this.graph.vectors.find((vec: Vector) => {
+        const vector = graph.vectors.find((vec: Vector) => {
             return pattern.test(vec.url);
         }) as Vector;
         if (!vector && url) {
@@ -106,7 +107,7 @@ export default class Scheduler {
         }
         if (vector) {
             this.logger.info("Executing vector at URL " + url);
-            await execute(this, this.graph, vector, "$url", value, null);
+            await execute(this, graph, vector, field, value, currentVector);
         }
         this.dispatchEvent("end", {
             url,
