@@ -327,7 +327,7 @@ describe("Scheduler error states and matching error events", () => {
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Vector: Critical Error: Linked graph not found on vector.id: 2";
+            const match = "Error: Edge: Error occured during vector.execute: Error: Critical Error: Linked graph not found on vector.id: 2";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();
@@ -382,24 +382,7 @@ describe("Scheduler error states and matching error events", () => {
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Vector: Edge setter error. field proxy, vector.id 1: TypeError: Cannot read property 'length' of undefined";
-            expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
-            expect(evs[0].message).toMatch(match);
-            return done();
-        });
-    });
-    it("Should log an error if scheduler encouters a malformed linked graph map", (done) => {
-        const scheduler = new Scheduler(stubs.malformedSchemaSubGraphMap, {}, {}, stubs.console);
-        global.fetch = fetchMock(() => {
-            return stubs.proxyToLog;
-        });
-        const evs = [];
-        scheduler.addEventListener("error", (e) => {
-            evs.push(e);
-        });
-        scheduler.url("index");
-        setTimeout(() => {
-            const match = "Edge: Error occured during vector.execute: TypeError: Cannot read property 'field' of undefined";
+            const match = "Error: Vector: Edge setter error. field proxy, vector.id 1";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();

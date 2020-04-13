@@ -1,6 +1,7 @@
 import Vector from "./Vector";
 import {execute} from "./Edge";
-import {LoadEvent, Graph, newId, Logger, nullLogger, SchedulerEvent, ExecutionResult, Warning, EdgeError, VectorSetEvent} from "./Shared";
+import {ConnectorEvent, LoadEvent, Graph, newId, Logger, nullLogger,
+    SchedulerEvent, ExecutionResult, Warning, EdgeError, VectorSetEvent} from "./Shared";
 import Loader from "./Loader";
 /** Graph execution engine */
 export default class Scheduler {
@@ -62,7 +63,7 @@ export default class Scheduler {
         this.events[eventName].splice(idx, 1);
     }
     /** Adds an event listener */
-    addEventListener(eventName: string, listener: (eventData: SchedulerEvent | LoadEvent | EdgeError | VectorSetEvent | Error | Warning) => void): void {
+    addEventListener(eventName: string, listener: (eventData: ConnectorEvent| SchedulerEvent | LoadEvent | EdgeError | VectorSetEvent | Error | Warning) => void): void {
         this.logger.debug("Scheduler: Add event " + eventName);
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(listener);
@@ -83,8 +84,7 @@ export default class Scheduler {
         return this.graphPath.replace("{id}", id).replace("{version}", version.toString());
     }
     /** Navigate to a given vector via vector URL */
-    async url(url: string, value: any, field: string, currentVector: Vector, graph?: Graph): Promise<ExecutionResult> {
-        graph = graph || this.graph;
+    async url(url: string, value: any, field: string, currentVector: Vector): Promise<ExecutionResult> {
         this.logger.debug("Scheduler: Set URL " + url);
         const start = Date.now();
         this.dispatchEvent("begin", {
@@ -92,6 +92,12 @@ export default class Scheduler {
             time: start,
             id: newId(),
         } as SchedulerEvent);
+        let graph;
+        if (currentVector && currentVector.linkedGraph && currentVector.linkedGraph.graph) {
+            graph = currentVector.linkedGraph.graph;
+        } else {
+            graph = this.graph;
+        }
         const pattern = new RegExp(url);
         const vector = graph.vectors.find((vec: Vector) => {
             return pattern.test(vec.url);
@@ -107,7 +113,7 @@ export default class Scheduler {
         }
         if (vector) {
             this.logger.info("Executing vector at URL " + url);
-            await execute(this, graph, vector, field, value, currentVector);
+            await execute(this, graph, vector, field, value);
         }
         this.dispatchEvent("end", {
             url,
