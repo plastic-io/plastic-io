@@ -9,16 +9,15 @@ import Vector from "./Vector";
 export interface LoadEvent extends SchedulerEvent {
     /** The unique UUID of the event */
     id: string;
-    /** Time the event occurred */
-    time: number;
-    /** How long the event took */
-    duration?: number;
     /** Calling the setValue function will set the linked graph or vector and
      * stop the default global fetch function from being called
      */
     setValue: Function; // tslint:disable-line
     /** The url of the artifact */
     url: string;
+}
+export interface ConnectorEvent extends SchedulerEvent {
+    connector: Connector;
 }
 /** Connects two vector edges together */
 export interface Connector {

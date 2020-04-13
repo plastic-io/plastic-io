@@ -15,16 +15,19 @@ import {
     newId,
     GraphProperties,
     ExecutionResult,
+    ConnectorEvent,
     SchedulerEvent,
     EdgeError,
     Warning,
 } from "./Shared";
 import Scheduler from "./Scheduler";
 import Edge from "./Edge";
-import Vector from "./Vector";
+import Vector, {linkInnerVectorEdges, getLinkedInputs} from "./Vector";
 import Loader from "./Loader";
 export default Scheduler;
 export {
+    getLinkedInputs,
+    linkInnerVectorEdges,
     Loader,
     Vector,
     Edge,
@@ -42,6 +45,7 @@ export {
     GraphProperties,
     ExecutionResult,
     SchedulerEvent,
+    ConnectorEvent,
     EdgeError,
     Warning,
 }
