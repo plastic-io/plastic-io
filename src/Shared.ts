@@ -1,4 +1,5 @@
 import Vector from "./Vector";
+import Scheduler from "./Scheduler";
 /**
  * Occurs when a linked vector or graph are loaded.
  * The fetch function in the global scope is used to fetch URLs.
@@ -93,6 +94,8 @@ export interface LinkedGraph {
 }
 /** Interface provided to vector set methods at runtime */
 export interface VectorInterface {
+    /** The scheduler */
+    scheduler: Scheduler;
     /** The vector being set */
     vector: Vector;
     /** The name of the edge being set */

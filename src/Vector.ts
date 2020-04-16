@@ -40,7 +40,8 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
     });
     const vectorFn = new Function("graph", "cache", "vector", "field",
         "state", "value", "edges", "data", "properties", generate(ast));
-    return await vectorFn(
+    return await vectorFn.call(
+        vectorInterface.scheduler,
         vectorInterface.graph,
         vectorInterface.cache,
         vectorInterface.vector,
@@ -239,6 +240,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
     scheduler.vectorCache[vect.id] = scheduler.vectorCache[vect.id] || {};
     // provide interface for invoking code
     const vectorInterface = {
+        scheduler,
         edges,
         state: scheduler.state,
         field,
