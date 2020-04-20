@@ -72,7 +72,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>This event is dispatched after vector set code has been executed.
+						<p>This event is dispatched before and after vector set code has been executed.
 						The global return value for the vector set code can be found here.</p>
 					</div>
 				</div>
@@ -103,6 +103,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="_shared_.vectorsetevent.html#graphid" class="tsd-kind-icon">graph<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="_shared_.vectorsetevent.html#id" class="tsd-kind-icon">id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="_shared_.vectorsetevent.html#return" class="tsd-kind-icon">return</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="_shared_.vectorsetevent.html#setcontext" class="tsd-kind-icon">set<wbr>Context</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external"><a href="_shared_.vectorsetevent.html#time" class="tsd-kind-icon">time</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="_shared_.vectorsetevent.html#vectorid" class="tsd-kind-icon">vector<wbr>Id</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="_shared_.vectorsetevent.html#vectorinterface" class="tsd-kind-icon">vector<wbr>Interface</a></li>
@@ -120,7 +121,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_shared_.loadevent.html">LoadEvent</a>.<a href="_shared_.loadevent.html#duration">duration</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L220">Shared.ts:220</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L232">Shared.ts:232</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -135,7 +136,7 @@
 					<div class="tsd-signature tsd-kind-icon">err<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Error</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L132">Shared.ts:132</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L138">Shared.ts:138</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -150,7 +151,7 @@
 					<div class="tsd-signature tsd-kind-icon">field<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L146">Shared.ts:146</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L153">Shared.ts:153</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -165,7 +166,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L144">Shared.ts:144</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L151">Shared.ts:151</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -181,7 +182,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_shared_.connectorevent.html">ConnectorEvent</a>.<a href="_shared_.connectorevent.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L216">Shared.ts:216</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L228">Shared.ts:228</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -192,18 +193,36 @@
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
 					<a name="return" class="tsd-anchor"></a>
-					<h3>return</h3>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> return</h3>
 					<div class="tsd-signature tsd-kind-icon">return<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L138">Shared.ts:138</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L145">Shared.ts:145</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>Return value if any.  This requires the set function
 								to return in the global scope.  This has no impact on graph execution,
-							the value does not connect to other vectors.</p>
+								the value does not connect to other vectors.  This value is only present
+							on the afterSet event.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="setcontext" class="tsd-anchor"></a>
+					<h3>set<wbr>Context</h3>
+					<div class="tsd-signature tsd-kind-icon">set<wbr>Context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Function</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L158">Shared.ts:158</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Calling the setContext function will allow you to set the context of the
+								set function.  This is useful to do setup on every set function that runs
+							to attach context data to the function</p>
 						</div>
 					</div>
 				</section>
@@ -214,7 +233,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_shared_.loadevent.html">LoadEvent</a>.<a href="_shared_.loadevent.html#time">time</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L218">Shared.ts:218</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L230">Shared.ts:230</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -229,7 +248,7 @@
 					<div class="tsd-signature tsd-kind-icon">vector<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L142">Shared.ts:142</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L149">Shared.ts:149</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -244,7 +263,7 @@
 					<div class="tsd-signature tsd-kind-icon">vector<wbr>Interface<span class="tsd-signature-symbol">:</span> <a href="_shared_.vectorinterface.html" class="tsd-signature-type">VectorInterface</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/357a0e6/src/Shared.ts#L140">Shared.ts:140</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/3d17aac/src/Shared.ts#L147">Shared.ts:147</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -344,6 +363,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
 								<a href="_shared_.vectorsetevent.html#return" class="tsd-kind-icon">return</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="_shared_.vectorsetevent.html#setcontext" class="tsd-kind-icon">set<wbr>Context</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-external">
 								<a href="_shared_.vectorsetevent.html#time" class="tsd-kind-icon">time</a>

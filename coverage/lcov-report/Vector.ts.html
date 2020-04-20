@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">96.83% </span>
+                <span class="strong">95.35% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>122/126</span>
+                <span class='fraction'>123/129</span>
             </div>
         
             
@@ -37,16 +37,16 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">93.75% </span>
+                <span class="strong">88.24% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>15/16</span>
+                <span class='fraction'>15/17</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">97.41% </span>
+                <span class="strong">95.8% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>113/116</span>
+                <span class='fraction'>114/119</span>
             </div>
         
             
@@ -350,11 +350,34 @@
 <a name='L291'></a><a href='#L291'>291</a>
 <a name='L292'></a><a href='#L292'>292</a>
 <a name='L293'></a><a href='#L293'>293</a>
-<a name='L294'></a><a href='#L294'>294</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L294'></a><a href='#L294'>294</a>
+<a name='L295'></a><a href='#L295'>295</a>
+<a name='L296'></a><a href='#L296'>296</a>
+<a name='L297'></a><a href='#L297'>297</a>
+<a name='L298'></a><a href='#L298'>298</a>
+<a name='L299'></a><a href='#L299'>299</a>
+<a name='L300'></a><a href='#L300'>300</a>
+<a name='L301'></a><a href='#L301'>301</a>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a>
+<a name='L304'></a><a href='#L304'>304</a>
+<a name='L305'></a><a href='#L305'>305</a>
+<a name='L306'></a><a href='#L306'>306</a>
+<a name='L307'></a><a href='#L307'>307</a>
+<a name='L308'></a><a href='#L308'>308</a>
+<a name='L309'></a><a href='#L309'>309</a>
+<a name='L310'></a><a href='#L310'>310</a>
+<a name='L311'></a><a href='#L311'>311</a>
+<a name='L312'></a><a href='#L312'>312</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -393,6 +416,19 @@
 <span class="cline-any cline-yes">30x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -675,6 +711,11 @@ export default interface Vector {
     properties: any;
     /** Vector template.  Defines UX and runtime code. */
     template: VectorTemplate;
+    /**
+     * Ephemeral value that should not be commited to a data store.
+     * Used to store domain specific instance idenfitifer.
+     */
+    __contextId: any;
 }
 async function parseAndRun(code: string, vectorInterface: VectorInterface): Promise&lt;any&gt; {
     const ast = parseScript(code, {
@@ -683,9 +724,22 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         next: true,
         globalReturn: true,
     });
-    const vectorFn = new Function("graph", "cache", "vector", "field",
+    const vectorFn = new Function("scheduler", "graph", "cache", "vector", "field",
         "state", "value", "edges", "data", "properties", generate(ast));
+    vectorInterface.scheduler.dispatchEvent("set", {
+        id: newId(),
+        vectorId: vectorInterface.vector.id,
+        graphId: vectorInterface.vector.graphId,
+        field: vectorInterface.field,
+        time: Date.now(),
+        vectorInterface,
+<span class="fstat-no" title="function not covered" >        setContext(</span>val: any) {
+<span class="cstat-no" title="statement not covered" >            vectorInterface.scheduler.logger.debug(`Vector: setContext setting context of vector.`);</span>
+<span class="cstat-no" title="statement not covered" >            vectorInterface.context = val;</span>
+        },
+    } as VectorSetEvent);
     return await vectorFn.call(
+        vectorInterface.context,
         vectorInterface.scheduler,
         vectorInterface.graph,
         vectorInterface.cache,
@@ -915,7 +969,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 field,
             } as EdgeError);
         }
-        scheduler.dispatchEvent("set", {
+        scheduler.dispatchEvent("afterSet", {
             id: newId(),
             err: er,
             return: setResult,
@@ -943,7 +997,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Apr 16 2020 07:56:31 GMT+0000 (Coordinated Universal Time)
+                at Mon Apr 20 2020 00:41:07 GMT+0000 (Coordinated Universal Time)
             </div>
         </div>
         <script src="prettify.js"></script>
