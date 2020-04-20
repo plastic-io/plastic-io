@@ -259,13 +259,13 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.addEventListener("beginedge", () => {
             seq.push("beginedge");
         });
-        scheduler.addEventListener("set", (e) => {
-            seq.push("set");
+        scheduler.addEventListener("afterSet", (e) => {
+            seq.push("afterSet");
             seq.push(e.return);
         });
         scheduler.addEventListener("endedge", () => {
             seq.push("endedge");
-            expect(seq.join(",")).toEqual("begin,beginedge,end,set,-0.8390715290764524,endedge");
+            expect(seq.join(",")).toEqual("begin,beginedge,end,afterSet,-0.8390715290764524,endedge");
             return done();
         });
         scheduler.addEventListener("end", () => {
@@ -364,7 +364,7 @@ describe("Scheduler error states and matching error events", () => {
     it("Should log an error if a set template causes an error", (done) => {
         const scheduler = new Scheduler(stubs.badVectorSet, {}, {}, stubs.console);
         const evs = [];
-        scheduler.addEventListener("set", (e) => {
+        scheduler.addEventListener("afterSet", (e) => {
             evs.push(e.err.toString());
         });
         scheduler.url("index");

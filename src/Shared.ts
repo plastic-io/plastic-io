@@ -122,9 +122,15 @@ export interface VectorInterface {
      * domain interfaces.
      */
     properties: object;
+    /**
+     * User setable vector set context (value of `this` during set).
+     * this is setable on a per vector set instance basis by subscribing to
+     * set and running e.setContext.
+     */
+    context: any;
 }
 /**
- * This event is dispatched after vector set code has been executed.
+ * This event is dispatched before and after vector set code has been executed.
  * The global return value for the vector set code can be found here.
  */
 export interface VectorSetEvent extends SchedulerEvent {
@@ -133,9 +139,10 @@ export interface VectorSetEvent extends SchedulerEvent {
     /**
      * Return value if any.  This requires the set function
      * to return in the global scope.  This has no impact on graph execution,
-     * the value does not connect to other vectors.
+     * the value does not connect to other vectors.  This value is only present
+     * on the afterSet event.
      */
-    return: any;
+    return?: any;
     /** The vector interface passed to the set function. */
     vectorInterface: VectorInterface;
     /** The vectorId where the set event occured */
@@ -144,6 +151,10 @@ export interface VectorSetEvent extends SchedulerEvent {
     graphId: string;
     /** The field where the set event occured */
     field: string;
+    /** Calling the setContext function will allow you to set the context of the
+    set function.  This is useful to do setup on every set function that runs
+    to attach context data to the function */
+    setContext: Function; // tslint:disable-line
 }
 /** Used to hold the place of logger methods when no logger is specified */
 export function nullFunction(): void {
