@@ -30,6 +30,11 @@ export default interface Vector {
     properties: any;
     /** Vector template.  Defines UX and runtime code. */
     template: VectorTemplate;
+    /**
+     * Ephemeral value that should not be commited to a data store.
+     * Used to store domain specific instance idenfitifer.
+     */
+    __contextId: any;
 }
 async function parseAndRun(code: string, vectorInterface: VectorInterface): Promise<any> {
     const ast = parseScript(code, {
@@ -38,9 +43,22 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         next: true,
         globalReturn: true,
     });
-    const vectorFn = new Function("graph", "cache", "vector", "field",
+    const vectorFn = new Function("scheduler", "graph", "cache", "vector", "field",
         "state", "value", "edges", "data", "properties", generate(ast));
+    vectorInterface.scheduler.dispatchEvent("set", {
+        id: newId(),
+        vectorId: vectorInterface.vector.id,
+        graphId: vectorInterface.vector.graphId,
+        field: vectorInterface.field,
+        time: Date.now(),
+        vectorInterface,
+        setContext(val: any) {
+            vectorInterface.scheduler.logger.debug(`Vector: setContext setting context of vector.`);
+            vectorInterface.context = val;
+        },
+    } as VectorSetEvent);
     return await vectorFn.call(
+        vectorInterface.context,
         vectorInterface.scheduler,
         vectorInterface.graph,
         vectorInterface.cache,
@@ -270,7 +288,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                 field,
             } as EdgeError);
         }
-        scheduler.dispatchEvent("set", {
+        scheduler.dispatchEvent("afterSet", {
             id: newId(),
             err: er,
             return: setResult,
