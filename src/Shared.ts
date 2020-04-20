@@ -152,8 +152,9 @@ export interface VectorSetEvent extends SchedulerEvent {
     /** The field where the set event occured */
     field: string;
     /** Calling the setContext function will allow you to set the context of the
-    set function.  This is useful to do setup on every set function that runs
-    to attach context data to the function */
+     * set function.  This is useful to do setup on every set function that runs
+     * to attach context data to the function
+     */
     setContext: Function; // tslint:disable-line
 }
 /** Used to hold the place of logger methods when no logger is specified */

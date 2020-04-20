@@ -32,7 +32,7 @@ export default interface Vector {
     template: VectorTemplate;
     /**
      * Ephemeral value that should not be commited to a data store.
-     * Used to store domain specific instance idenfitifer. 
+     * Used to store domain specific instance idenfitifer.
      */
     __contextId: any;
 }
