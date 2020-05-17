@@ -193,6 +193,7 @@ export function newId(): string {
 /** Represents the base graph schema */
 export interface Graph {
     id: string;
+    url: string;
     vectors: Vector[];
     properties: GraphProperties;
     version: number;
