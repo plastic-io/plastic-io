@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1587343267660" clover="3.2.0">
-  <project timestamp="1587343267660" name="All files">
-    <metrics statements="237" coveredstatements="231" conditionals="80" coveredconditionals="73" methods="38" coveredmethods="36" elements="355" coveredelements="340" complexity="0" loc="237" ncloc="237" packages="1" files="6" classes="6"/>
+<coverage generated="1589739347602" clover="3.2.0">
+  <project timestamp="1589739347602" name="All files">
+    <metrics statements="237" coveredstatements="231" conditionals="80" coveredconditionals="73" methods="41" coveredmethods="36" elements="358" coveredelements="340" complexity="0" loc="237" ncloc="237" packages="1" files="6" classes="6"/>
     <file name="Edge.ts" path="/home/runner/work/plastic-io/plastic-io/src/Edge.ts">
       <metrics statements="13" coveredstatements="13" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
       <line num="1" count="1" type="stmt"/>
@@ -246,7 +246,7 @@
       <line num="301" count="2" type="stmt"/>
     </file>
     <file name="index.ts" path="/home/runner/work/plastic-io/plastic-io/src/index.ts">
-      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
       <line num="4" count="1" type="stmt"/>
       <line num="23" count="1" type="stmt"/>
       <line num="25" count="1" type="stmt"/>
