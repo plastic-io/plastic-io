@@ -44,7 +44,7 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         globalReturn: true,
     });
     const vectorFn = new Function("scheduler", "graph", "cache", "vector", "field",
-        "state", "value", "edges", "data", "properties", generate(ast));
+        "state", "value", "edges", "data", "properties", "require", generate(ast));
     vectorInterface.scheduler.dispatchEvent("set", {
         id: newId(),
         vectorId: vectorInterface.vector.id,
@@ -69,6 +69,9 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         vectorInterface.edges,
         vectorInterface.data,
         vectorInterface.properties,
+        (path: any) => {
+            return eval("require")(path);
+        },
     );
 }
 export function getLinkedInputs(vect: Vector, field: string, scheduler: Scheduler): any {
