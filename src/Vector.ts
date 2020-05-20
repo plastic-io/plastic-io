@@ -70,7 +70,7 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         vectorInterface.data,
         vectorInterface.properties,
         (path: any) => {
-            return eval("require")(path);
+            return eval("require")(path); // tslint:disable-line
         },
     );
 }
