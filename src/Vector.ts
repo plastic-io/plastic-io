@@ -212,7 +212,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                                 time: start,
                                 id: newId(),
                                 connector,
-                                value,
+                                value: val,
                             } as ConnectorEvent);
                             await edgeExecute(scheduler, graph, vectorNext, connector.field, val);
                             const end = Date.now();
@@ -221,7 +221,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
                                 duration: end - start,
                                 id: newId(),
                                 connector,
-                                value,
+                                value: val,
                             } as ConnectorEvent);
                         } else {
                             const err = new Error(`Connector refers to a vector edge that does not exist.  Connector.id: ${connector.id}`);
