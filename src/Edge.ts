@@ -32,7 +32,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector
             value,
         } as SchedulerEvent);
     }
-    vectorExecute(scheduler, graph, vector, field, value)
+    await vectorExecute(scheduler, graph, vector, field, value)
     .then(end)
     .catch((err) => {
         const er = new Error("Edge: Error occured during vector.execute: " + err.stack);

@@ -78,7 +78,7 @@ describe("Scheduler graph linking input and output connectors", () => {
             });
         });
     });
-    it("Should load a graph that has a linked graph vector that links a proxy log graph, call a second time, and expect to only have fetch called once proving the cache works.", (done) => {
+    it("Should load a graph that has a linked graph vector that links a proxy log graph, call a second time, and expect to have fetch called twice proving clearCache works.", (done) => {
         const scheduler = new Scheduler(stubs.cacheLinkedGraph, {}, {});
         let fetchCount = 0;
         global.fetch = fetchMock(() => {
@@ -86,11 +86,9 @@ describe("Scheduler graph linking input and output connectors", () => {
             return stubs.proxyToLog;
         });
         global.console.info = jest.fn();
-        scheduler.url("index");
-        setTimeout(() => {
+        scheduler.url("index").then(() => {
             scheduler.graphLoader.clearCache();
-            scheduler.url("index");
-            setTimeout(() => {
+            scheduler.url("index").then(() => {
                 expect(fetchCount).toEqual(2);
                 return done();
             });
@@ -242,13 +240,14 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         });
         scheduler.addEventListener("endedge", () => {
             seq.push("endedge");
-            expect(seq.join(",")).toEqual("begin,beginedge,end,endedge");
-            return done();
         });
         scheduler.addEventListener("end", () => {
             seq.push("end");
         });
-        scheduler.url("index");
+        scheduler.url("index").then(() => {
+            expect(seq.join(",")).toEqual("begin,beginedge,endedge,end");
+            done();
+        });
     });
     it("Should emit a begin, beginedge, end, set, then endedge.  Return data should be -0.8390715290764524 (Math.cos(10))", (done) => {
         const scheduler = new Scheduler(stubs.mathCosVector);
@@ -265,13 +264,14 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         });
         scheduler.addEventListener("endedge", () => {
             seq.push("endedge");
-            expect(seq.join(",")).toEqual("begin,beginedge,end,afterSet,-0.8390715290764524,endedge");
-            return done();
         });
         scheduler.addEventListener("end", () => {
             seq.push("end");
         });
-        scheduler.url("index", 10);
+        scheduler.url("index", 10).then(() => {
+            expect(seq.join(",")).toEqual("begin,beginedge,afterSet,-0.8390715290764524,endedge,end");
+            done();
+        });
     });
 });
 describe("Scheduler error states and matching error events", () => {
