@@ -21,30 +21,28 @@ export default class Loader<T> {
         });
     }
     async load(url: string): Promise<T> {
-        const scheduler = this.scheduler;
-        const cache = this.cache;
-        scheduler.logger.debug("Loader: loading: " + url);
+        this.scheduler.logger.debug("Loader: loading: " + url);
         const ev = {
             time: Date.now(),
             id: newId(),
             url,
-            setValue(val: T) {
-                scheduler.logger.debug("Loader: loading resource via load event: " + url);
-                cache[url] = val;
+            setValue: (val: T) => {
+                this.scheduler.logger.debug("Loader: loading resource via load event: " + url);
+                this.cache[url] = val;
             }
         } as LoadEvent;
-        scheduler.dispatchEvent("load", ev);
-        if (cache[url]) {
-            scheduler.logger.debug("Loader: cache hit: " + url);
-            return cache[url];
+        this.scheduler.dispatchEvent("load", ev);
+        if (this.cache[url]) {
+            this.scheduler.logger.debug("Loader: cache hit: " + url);
+            return this.cache[url];
         }
-        scheduler.logger.debug("Loader: cache miss: " + url);
+        this.scheduler.logger.debug("Loader: cache miss: " + url);
         if (typeof fetch === "undefined") {
             const er = new Error("Fetch is not defined.  For URLs to be " +
                 "fetched you must define a global fetch method that complies " +
                 "with https://fetch.spec.whatwg.org/.");
-            scheduler.logger.error(er.stack);
-            scheduler.dispatchEvent("error", {
+            this.scheduler.logger.error(er.stack);
+            this.scheduler.dispatchEvent("error", {
                 id: newId(),
                 time: Date.now(),
                 err: er,
@@ -53,9 +51,9 @@ export default class Loader<T> {
             } as EdgeError);
             throw er;
         }
-        scheduler.logger.debug("Loader: loading resource via fetch: " + url);
+        this.scheduler.logger.debug("Loader: loading resource via fetch: " + url);
         const data = await fetch(url);
-        cache[url] = await data.json();
-        return cache[url];
+        this.cache[url] = await data.json();
+        return this.cache[url];
     }
 }
