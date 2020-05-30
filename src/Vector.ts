@@ -43,7 +43,9 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         next: true,
         globalReturn: true,
     });
-    const vectorFn = new Function("scheduler", "graph", "cache", "vector", "field",
+    // tslint:disable-next-line
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor; // eslint-disable-line 
+    const vectorFn = new AsyncFunction("scheduler", "graph", "cache", "vector", "field",
         "state", "value", "edges", "data", "properties", "require", generate(ast));
     vectorInterface.scheduler.dispatchEvent("set", {
         id: newId(),
