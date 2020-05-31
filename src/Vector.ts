@@ -4,6 +4,29 @@ import {generate} from "escodegen";
 import Scheduler from "./Scheduler";
 import {ConnectorEvent, Graph, newId, EdgeError, VectorTemplate,
     LinkedVector, LinkedGraph, VectorInterface, VectorSetEvent} from "./Shared";
+/**
+ *
+ * Vectors are the building blocks of the graph.
+ * Vectors represent a unit of code.
+ * Units of code in Plastic-IO are _domain agnostic_.
+ * That means the code in your vectors can execute in many different domains.
+ * For example, your vector can be called upon to work in a browser environment
+ * or in the server environment.
+ *
+ * Your vector addtionally can be called upon to supply a user interface to
+ * simply display data, or to provide a complex control panel.
+ *
+ * Your vector also contains tests, and is segmented from the graph in such a way
+ * that it can be imported to other graphs where users can reuse to the
+ * units of code that you create.
+ *
+ * This is made version safe through [Event Sourcing](https://martinfowler.com/eaaDev/EventSourcing.html) patterns.
+ * Vecotrs, as well as {@link Graph}s are made to be shared.
+ *
+ * Although it's not difficult to construct Plastic-IO graphs by hand.
+ * You can also use the [Plastic-IO Graph Editor](https://github.com/plastic-io/graph-editor).
+ *
+ */
 export default interface Vector {
     /** The unique UUID of this vector */
     id: string;
@@ -36,6 +59,7 @@ export default interface Vector {
      */
     __contextId: any;
 }
+/** Utility to parse and run vectors.  Used internally to run the vector's set function. */
 async function parseAndRun(code: string, vectorInterface: VectorInterface): Promise<any> {
     const ast = parseScript(code, {
         loc: true,
@@ -76,6 +100,7 @@ async function parseAndRun(code: string, vectorInterface: VectorInterface): Prom
         },
     );
 }
+/** Utility to connect linked vectors and the host graph's vector.  Used internally. */
 export function getLinkedInputs(vect: Vector, field: string, scheduler: Scheduler): any {
     const log = scheduler.logger;
     const graph = vect.linkedGraph!.graph;// eslint-disable-line
@@ -99,6 +124,7 @@ export function getLinkedInputs(vect: Vector, field: string, scheduler: Schedule
         vector: vect,
     };
 }
+/** Utility to connect linked vectors and the host graph's vector.  Used internally. */
 export function linkInnerVectorEdges(vect: Vector, scheduler: Scheduler): void {
     const log = scheduler.logger;
     const graph = vect.linkedGraph!.graph;// eslint-disable-line
@@ -140,7 +166,7 @@ export function linkInnerVectorEdges(vect: Vector, scheduler: Scheduler): void {
         });
     });
 }
-/** Run connector code in isolation, create interface */
+/** Run connector code in isolation, creates interface.  Used internally. */
 export async function execute(scheduler: Scheduler, graph: Graph, vector: Vector, field: string, value: any): Promise<any> {
     const log = scheduler.logger;
     log.debug(`Vector: Begin execute vector.id ${vector.id}, field ${field}`);

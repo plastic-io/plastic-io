@@ -6,6 +6,14 @@ import Scheduler from "./Scheduler";
  * This behavior can be overridden by adding an event listener to
  * the load even and calling 'setValue' with the Vector or Graph
  * requested.
+ *
+ * ```typescript
+ * scheduler.addEventListener("load", async load(context: any, e: any) {
+ *      const item = await cstore.get(e.url);
+ *      e.setValue(item);
+ * });
+ * ```
+ *
  */
 export interface LoadEvent extends SchedulerEvent {
     /** The unique UUID of the event */
@@ -17,6 +25,7 @@ export interface LoadEvent extends SchedulerEvent {
     /** The url of the artifact */
     url: string;
 }
+/** Occurs when data is sent to a vector via an edge connector. */
 export interface ConnectorEvent extends SchedulerEvent {
     connector: Connector;
 }
@@ -190,7 +199,18 @@ export function newId(): string {
         return v.toString(16);
     });
 }
-/** Represents the base graph schema */
+/**
+ * Graphs are the containers of your Plastic-IO programs.  Graphs contain a collection of {@link Vector}s.
+ * Vectors contain a unit of executable code, along with view, test and any other code templates that
+ * constitute the functionality of the unit of code.  See {@link Vector} for more information.
+ *
+ * Graphs can be linked into other graphs.  When linked, the graph appears to be a vector on the host graph.
+ * A special map (See {@link Vector.linkedGraph}, {@link LinkedGraph.fields}) is created based on any Vector edges with the boolean value `external` set to true.
+ * This map makes specified edges on the internal graph connectable on the host graph via edges that will
+ * appear on the linked graph.
+ *
+ * To "start" a graph you typically point {@link Scheduler.url} at a {@link Vector.url}, which will invoke the Vector's set function ({@link VectorTemplate.set})
+ */
 export interface Graph {
     id: string;
     url: string;
