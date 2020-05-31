@@ -72,8 +72,15 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Represents the base graph schema</p>
+						<p>Graphs are the containers of your Plastic-IO programs.  Graphs contain a collection of <a href="_vector_.vector.html">Vector</a>s.
+							Vectors contain a unit of executable code, along with view, test and any other code templates that
+						constitute the functionality of the unit of code.  See <a href="_vector_.vector.html">Vector</a> for more information.</p>
 					</div>
+					<p>Graphs can be linked into other graphs.  When linked, the graph appears to be a vector on the host graph.
+						A special map (See <a href="_vector_.vector.html#linkedgraph">Vector.linkedGraph</a>, <a href="_shared_.linkedgraph.html#fields">LinkedGraph.fields</a>) is created based on any Vector edges with the boolean value <code>external</code> set to true.
+						This map makes specified edges on the internal graph connectable on the host graph via edges that will
+					appear on the linked graph.</p>
+					<p>To &quot;start&quot; a graph you typically point <a href="../classes/_scheduler_.scheduler.html#url">Scheduler.url</a> at a <a href="_vector_.vector.html#url">Vector.url</a>, which will invoke the Vector&#39;s set function (<a href="_shared_.vectortemplate.html#set">VectorTemplate.set</a>)</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -109,7 +116,7 @@
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L195">Shared.ts:195</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L215">Shared.ts:215</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -119,7 +126,7 @@
 					<div class="tsd-signature tsd-kind-icon">properties<span class="tsd-signature-symbol">:</span> <a href="_shared_.graphproperties.html" class="tsd-signature-type">GraphProperties</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L198">Shared.ts:198</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L218">Shared.ts:218</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -129,7 +136,7 @@
 					<div class="tsd-signature tsd-kind-icon">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L196">Shared.ts:196</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L216">Shared.ts:216</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -139,7 +146,7 @@
 					<div class="tsd-signature tsd-kind-icon">vectors<span class="tsd-signature-symbol">:</span> <a href="_vector_.vector.html" class="tsd-signature-type">Vector</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L197">Shared.ts:197</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L217">Shared.ts:217</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -149,7 +156,7 @@
 					<div class="tsd-signature tsd-kind-icon">version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L199">Shared.ts:199</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L219">Shared.ts:219</a></li>
 						</ul>
 					</aside>
 				</section>

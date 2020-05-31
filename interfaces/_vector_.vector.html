@@ -69,6 +69,27 @@
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
+			<section class="tsd-panel tsd-comment">
+				<div class="tsd-comment tsd-typography">
+					<div class="lead">
+						<p>Vectors are the building blocks of the graph.
+							Vectors represent a unit of code.
+							Units of code in Plastic-IO are <em>domain agnostic</em>.
+							That means the code in your vectors can execute in many different domains.
+							For example, your vector can be called upon to work in a browser environment
+						or in the server environment.</p>
+					</div>
+					<p>Your vector addtionally can be called upon to supply a user interface to
+					simply display data, or to provide a complex control panel.</p>
+					<p>Your vector also contains tests, and is segmented from the graph in such a way
+						that it can be imported to other graphs where users can reuse to the
+					units of code that you create.</p>
+					<p>This is made version safe through <a href="https://martinfowler.com/eaaDev/EventSourcing.html">Event Sourcing</a> patterns.
+					Vecotrs, as well as <a href="_shared_.graph.html">Graph</a>s are made to be shared.</p>
+					<p>Although it&#39;s not difficult to construct Plastic-IO graphs by hand.
+					You can also use the <a href="https://github.com/plastic-io/graph-editor">Plastic-IO Graph Editor</a>.</p>
+				</div>
+			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
@@ -108,7 +129,7 @@
 					<div class="tsd-signature tsd-kind-icon">__context<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L37">Vector.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L60">Vector.ts:60</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -124,7 +145,7 @@
 					<div class="tsd-signature tsd-kind-icon">data<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L24">Vector.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L47">Vector.ts:47</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -140,7 +161,7 @@
 					<div class="tsd-signature tsd-kind-icon">edges<span class="tsd-signature-symbol">:</span> <a href="_edge_.edge.html" class="tsd-signature-type">Edge</a><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L13">Vector.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L36">Vector.ts:36</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -155,7 +176,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L17">Vector.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L40">Vector.ts:40</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -170,7 +191,7 @@
 					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L9">Vector.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L32">Vector.ts:32</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -185,7 +206,7 @@
 					<div class="tsd-signature tsd-kind-icon">linked<wbr>Graph<span class="tsd-signature-symbol">:</span> <a href="_shared_.linkedgraph.html" class="tsd-signature-type">LinkedGraph</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L10">Vector.ts:10</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L33">Vector.ts:33</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -195,7 +216,7 @@
 					<div class="tsd-signature tsd-kind-icon">linked<wbr>Vector<span class="tsd-signature-symbol">:</span> <a href="_shared_.linkedvector.html" class="tsd-signature-type">LinkedVector</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L11">Vector.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L34">Vector.ts:34</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -205,7 +226,7 @@
 					<div class="tsd-signature tsd-kind-icon">properties<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L30">Vector.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L53">Vector.ts:53</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -222,7 +243,7 @@
 					<div class="tsd-signature tsd-kind-icon">template<span class="tsd-signature-symbol">:</span> <a href="_shared_.vectortemplate.html" class="tsd-signature-type">VectorTemplate</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L32">Vector.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L55">Vector.ts:55</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -237,7 +258,7 @@
 					<div class="tsd-signature tsd-kind-icon">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L19">Vector.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L42">Vector.ts:42</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -252,7 +273,7 @@
 					<div class="tsd-signature tsd-kind-icon">version<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Vector.ts#L15">Vector.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Vector.ts#L38">Vector.ts:38</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">

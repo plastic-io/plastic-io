@@ -78,6 +78,10 @@
 							the load even and calling &#39;setValue&#39; with the Vector or Graph
 						requested.</p>
 					</div>
+					<pre><code class="language-typescript">scheduler.addEventListener(<span class="hljs-string">"load"</span>, <span class="hljs-keyword">async</span> load(context: <span class="hljs-built_in">any</span>, e: <span class="hljs-built_in">any</span>) {
+     <span class="hljs-keyword">const</span> item = <span class="hljs-keyword">await</span> cstore.get(e.url);
+     e.setValue(item);
+});</code></pre>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -119,7 +123,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_shared_.loadevent.html">LoadEvent</a>.<a href="_shared_.loadevent.html#duration">duration</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L233">Shared.ts:233</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L253">Shared.ts:253</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -135,7 +139,7 @@
 					<aside class="tsd-sources">
 						<p>Overrides <a href="_shared_.connectorevent.html">ConnectorEvent</a>.<a href="_shared_.connectorevent.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L12">Shared.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L20">Shared.ts:20</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -150,7 +154,7 @@
 					<div class="tsd-signature tsd-kind-icon">set<wbr>Value<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L16">Shared.ts:16</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L24">Shared.ts:24</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -167,7 +171,7 @@
 					<aside class="tsd-sources">
 						<p>Inherited from <a href="_shared_.loadevent.html">LoadEvent</a>.<a href="_shared_.loadevent.html#time">time</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L231">Shared.ts:231</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L251">Shared.ts:251</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -182,7 +186,7 @@
 					<div class="tsd-signature tsd-kind-icon">url<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Shared.ts#L18">Shared.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Shared.ts#L26">Shared.ts:26</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">

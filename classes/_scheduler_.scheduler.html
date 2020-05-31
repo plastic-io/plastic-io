@@ -72,8 +72,53 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Graph execution engine</p>
+						<a href="#scheduler" id="scheduler" style="color: inherit; text-decoration: none;">
+							<h1>Scheduler</h1>
+						</a>
 					</div>
+					<p>This is the graph execution engine.  To create graphs, see <a href="https://github.com/plastic-io/graph-editor">Plastic-IO Graph Editor</a>.</p>
+					<p>The Plastic-IO Graph Editor uses this engine to test and execute graphs in the browser.</p>
+					<p>If you&#39;re trying to execute graphs in an AWS environment, you might want to check out the <a href="https://github.com/plastic-io/graph-server">Plastic-IO Graph Server</a>.</p>
+					<p>If you want to implement the scheduler yourself and run graphs in your own way, then you have come to the right place!</p>
+					<p>To begin the execution of a graph, you must first instantiate your graph in the Scheduler.
+						See the <a href="_scheduler_.scheduler.html#constructor">Scheduler.constructor</a> for more information on instantiation.  After you instantiate
+					the scheduler, you can call <a href="_scheduler_.scheduler.html#url">Scheduler.url</a> to directly invoke a vector&#39;s edge (set function).</p>
+					<a href="#graph" id="graph" style="color: inherit; text-decoration: none;">
+						<h2>Graph</h2>
+					</a>
+					<p><a href="../interfaces/_shared_.graph.html">Graph</a>s contain arrays of <a href="../interfaces/_vector_.vector.html">Vector</a>s.  Vectors are executable units of code and can be local to the graph, or reference other vectors or graphs.</p>
+					<a href="#scheduler-execution-digram" id="scheduler-execution-digram" style="color: inherit; text-decoration: none;">
+						<h1>Scheduler Execution Digram</h1>
+					</a>
+					<pre><code>              1                         2                            3
+        +-------------+         +---------------+         +--------------------+
+        |<span class="hljs-string">             </span>|<span class="hljs-string">         </span>|<span class="hljs-string">               </span>|<span class="hljs-string">         </span>|<span class="hljs-string">                    </span>|
+        |<span class="hljs-string">  Scheduler  </span>|<span class="hljs-string">         </span>|<span class="hljs-string">  Vector Edge  </span>|<span class="hljs-string">         </span>|<span class="hljs-string">   Edge Connector   </span>|
+        |<span class="hljs-string">             </span>|<span class="hljs-string">         </span>|<span class="hljs-string">               </span>|<span class="hljs-string">         </span>|<span class="hljs-string">                    </span>|
+        +-------------+         +---------------+         +--------------------+
+               |<span class="hljs-string">                        </span>|<span class="hljs-string">                            </span>|
+               |<span class="hljs-string">                        </span>|<span class="hljs-string">                            </span>|
+               |<span class="hljs-string">                   +-----------------------------------------+
+              +-+                  </span>|<span class="hljs-string">   +-+        Graph Loop        +-+      </span>|
+              |<span class="hljs-string"> +-Scheduler.url()-----&gt;+ </span>|<span class="hljs-string">                          </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> +------edges[field]-------&gt;+ </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">   +-+                          </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">    </span>|<span class="hljs-string">                           </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">   +-+                          </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">   </span>|<span class="hljs-string"> </span>|<span class="hljs-string">                          </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> +&lt;----End--------------+ +&lt;-------------------------+ </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">   +-+                          </span>|<span class="hljs-string"> </span>|<span class="hljs-string">      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  </span>|<span class="hljs-string">    </span>|<span class="hljs-string">                           +-+      </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                  +-----------------------------------------+
+              </span>|<span class="hljs-string"> </span>|<span class="hljs-string">                       </span>|<span class="hljs-string">                            </span>|
+              |<span class="hljs-string"> </span>|<span class="hljs-string">                       </span>|<span class="hljs-string">                            </span>|
+              +-+                       |<span class="hljs-string">                            </span>|
+               |<span class="hljs-string">                        </span>|<span class="hljs-string">                            </span>|
+               +                        +                            +</code></pre><ol>
+						<li>Scheduler.url() calls a vector&#39;s edge (set function) based on the vector.url.</li>
+						<li>Vector Edge calls <code>edges[field]</code> which invokes n connectors referencing other vector edges</li>
+						<li>Vector edge is invoked just like step one, creating a graph loop.</li>
+					</ol>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -92,6 +137,22 @@
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Events</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#afterset" class="tsd-kind-icon">after<wbr>Set</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#begin" class="tsd-kind-icon">begin</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#beginconnector" class="tsd-kind-icon">beginconnector</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#beginedge" class="tsd-kind-icon">beginedge</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#end" class="tsd-kind-icon">end</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#endconnector" class="tsd-kind-icon">endconnector</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#endedge" class="tsd-kind-icon">endedge</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#error" class="tsd-kind-icon">error</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#load" class="tsd-kind-icon">load</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#set" class="tsd-kind-icon">set</a></li>
+								<li class="tsd-kind-event tsd-parent-kind-class tsd-is-external"><a href="_scheduler_.scheduler.html#warning" class="tsd-kind-icon">warning</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
@@ -136,32 +197,475 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L33">Scheduler.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L141">Scheduler.ts:141</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Plastic-io graph scheduler runtime.</p>
-								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>graph: <a href="../interfaces/_shared_.graph.html" class="tsd-signature-type">Graph</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Graph to execute.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> context: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> = {}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>What will appear as the <code>this</code> object for any vector set function that executes on your graph.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> state: <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> = {}</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Object that will be available to vector set functions during graph execution.  You can alter this object before or after instantiating the scheduler.  See <a href="../interfaces/_shared_.vectorinterface.html">VectorInterface</a>.</p>
+										</div>
+									</div>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> logger: <a href="../interfaces/_shared_.logger.html" class="tsd-signature-type">Logger</a><span class="tsd-signature-symbol"> = nullLogger</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Optional logging function to listen to info and debug messages coming out of the scheduler.  Functional messages are emitted via the event emitter.</p>
+											<a href="#basic-usage" id="basic-usage" style="color: inherit; text-decoration: none;">
+												<h3>Basic Usage</h3>
+											</a>
+											<p>To start graph execution, instantiate the scheduler and pass your graph to it.</p>
+											<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON);
+  scheduler.url(<span class="hljs-string">"my-graph-url"</span>);</code></pre>
+											<a href="#with-context" id="with-context" style="color: inherit; text-decoration: none;">
+												<h3>With Context</h3>
+											</a>
+											<p>You can also execute the graph and pass context variables to the vectors.
+												In the example below, vectors executing on myGraph will have access to <code>{foo: &quot;bar&quot;}</code> by accessing <code>this.foo</code> at runtime.
+												This allows you to attach properties like server response functions, database connections, client side component references, and many other things
+											use full to the vector&#39;s set function on runtime.</p>
+											<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON, {foo: <span class="hljs-string">"bar"</span>});</code></pre>
+											<a href="#with-state-defined" id="with-state-defined" style="color: inherit; text-decoration: none;">
+												<h3>With State Defined</h3>
+											</a>
+											<p>Vectors now have a mutable object with which they can share long running objects, data caches
+												or other resources that are expensive to instantiate per edge invocation.  State is whatever you pass into
+											before you instantiate the scheduler or at run time.  The scheduler has no opinion.</p>
+											<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON, {}, {foo: bar});</code></pre>
+											<a href="#using-the-logger" id="using-the-logger" style="color: inherit; text-decoration: none;">
+												<h3>Using the Logger</h3>
+											</a>
+											<p>You can listen to info and debug messages emitted from the scheduler by attaching an object or class
+											that matches the <a href="../interfaces/_shared_.logger.html">Logger</a> interface.  Which happens to be almost exactly like console.</p>
+											<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON, {}, {}, <span class="hljs-built_in">console</span>);</code></pre>
+										</div>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_scheduler_.scheduler.html" class="tsd-signature-type">Scheduler</a></h4>
 						</li>
 					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Events</h2>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="afterset" class="tsd-anchor"></a>
+					<h3>after<wbr>Set</h3>
+					<div class="tsd-signature tsd-kind-icon">after<wbr>Set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L115">Scheduler.ts:115</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs after a vector&#39;s set function has completed.  Contains the return value of the function.  Although this return value is present, using it is considered an anti-pattern and is only included for debugging.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="begin" class="tsd-anchor"></a>
+					<h3>begin</h3>
+					<div class="tsd-signature tsd-kind-icon">begin<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L65">Scheduler.ts:65</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when the graph begins to navigate to a vector&#39;s URL via the <a href="_scheduler_.scheduler.html#url">Scheduler.url</a> function.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="beginconnector" class="tsd-anchor"></a>
+					<h3>beginconnector</h3>
+					<div class="tsd-signature tsd-kind-icon">beginconnector<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L105">Scheduler.ts:105</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs as a vector&#39;s set function has called <code>edges[field] = &lt;value&gt;;</code>.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="beginedge" class="tsd-anchor"></a>
+					<h3>beginedge</h3>
+					<div class="tsd-signature tsd-kind-icon">beginedge<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L70">Scheduler.ts:70</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when a connector value enters into a vector&#39;s edge (input).</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="end" class="tsd-anchor"></a>
+					<h3>end</h3>
+					<div class="tsd-signature tsd-kind-icon">end<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L95">Scheduler.ts:95</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs at the end of the initial graph promise chain.  The graph may continue to run as asynchronous functions return.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="endconnector" class="tsd-anchor"></a>
+					<h3>endconnector</h3>
+					<div class="tsd-signature tsd-kind-icon">endconnector<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L110">Scheduler.ts:110</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when a connector promise chain has completed after a vector&#39;s set function has called <code>edges[field] = &lt;value&gt;;</code>.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.connectorevent.html" class="tsd-signature-type">ConnectorEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="endedge" class="tsd-anchor"></a>
+					<h3>endedge</h3>
+					<div class="tsd-signature tsd-kind-icon">endedge<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L75">Scheduler.ts:75</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs after all all edge promises are completed.  Note: If your vectors do not return promises.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.schedulerevent.html" class="tsd-signature-type">SchedulerEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="error" class="tsd-anchor"></a>
+					<h3>error</h3>
+					<div class="tsd-signature tsd-kind-icon">error<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.edgeerror.html" class="tsd-signature-type">EdgeError</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L80">Scheduler.ts:80</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when an error occurred during the invocation of a vector.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.edgeerror.html" class="tsd-signature-type">EdgeError</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.edgeerror.html" class="tsd-signature-type">EdgeError</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="load" class="tsd-anchor"></a>
+					<h3>load</h3>
+					<div class="tsd-signature tsd-kind-icon">load<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.loadevent.html" class="tsd-signature-type">LoadEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L85">Scheduler.ts:85</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when an external resource is loaded.  You can invoke <code>setValue</code> in the event argument to override the default loader with your own.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.loadevent.html" class="tsd-signature-type">LoadEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.loadevent.html" class="tsd-signature-type">LoadEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="set" class="tsd-anchor"></a>
+					<h3>set</h3>
+					<div class="tsd-signature tsd-kind-icon">set<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L100">Scheduler.ts:100</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs just before set is called.  You can use <code>setContext</code> to alter the <code>this</code> context object of the vector just before the vector&#39;s set function is invoked.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.vectorsetevent.html" class="tsd-signature-type">VectorSetEvent</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-event tsd-parent-kind-class tsd-is-external">
+					<a name="warning" class="tsd-anchor"></a>
+					<h3>warning</h3>
+					<div class="tsd-signature tsd-kind-icon">warning<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.warning.html" class="tsd-signature-type">Warning</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L90">Scheduler.ts:90</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Occurs when a warning is logged.</p>
+						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-siganture">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-event">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>e<span class="tsd-signature-symbol">: </span><a href="../interfaces/_shared_.warning.html" class="tsd-signature-type">Warning</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>e: <a href="../interfaces/_shared_.warning.html" class="tsd-signature-type">Warning</a></h5>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
@@ -172,7 +676,7 @@
 					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L19">Scheduler.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L127">Scheduler.ts:127</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -187,7 +691,7 @@
 					<div class="tsd-signature tsd-kind-icon">events<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L31">Scheduler.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L139">Scheduler.ts:139</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -210,7 +714,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_shared_.graph.html" class="tsd-signature-type">Graph</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L9">Scheduler.ts:9</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L117">Scheduler.ts:117</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -225,7 +729,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<wbr>Loader<span class="tsd-signature-symbol">:</span> <a href="_loader_.loader.html" class="tsd-signature-type">Loader</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_shared_.graph.html" class="tsd-signature-type">Graph</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L13">Scheduler.ts:13</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L121">Scheduler.ts:121</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -240,7 +744,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L27">Scheduler.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L135">Scheduler.ts:135</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -255,7 +759,7 @@
 					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_shared_.logger.html" class="tsd-signature-type">Logger</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L11">Scheduler.ts:11</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L119">Scheduler.ts:119</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -270,7 +774,7 @@
 					<div class="tsd-signature tsd-kind-icon">sequence<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L17">Scheduler.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L125">Scheduler.ts:125</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -285,7 +789,7 @@
 					<div class="tsd-signature tsd-kind-icon">state<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L21">Scheduler.ts:21</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L129">Scheduler.ts:129</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -300,7 +804,7 @@
 					<div class="tsd-signature tsd-kind-icon">vector<wbr>Cache<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L23">Scheduler.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L131">Scheduler.ts:131</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -325,7 +829,7 @@
 					<div class="tsd-signature tsd-kind-icon">vector<wbr>Loader<span class="tsd-signature-symbol">:</span> <a href="_loader_.loader.html" class="tsd-signature-type">Loader</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_vector_.vector.html" class="tsd-signature-type">Vector</a><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L15">Scheduler.ts:15</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L123">Scheduler.ts:123</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -340,7 +844,7 @@
 					<div class="tsd-signature tsd-kind-icon">vector<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L29">Scheduler.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L137">Scheduler.ts:137</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -362,7 +866,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L66">Scheduler.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L225">Scheduler.ts:225</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -411,7 +915,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L72">Scheduler.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L231">Scheduler.ts:231</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -442,7 +946,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L83">Scheduler.ts:83</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L242">Scheduler.ts:242</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -468,7 +972,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L80">Scheduler.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L239">Scheduler.ts:239</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -494,7 +998,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L54">Scheduler.ts:54</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L213">Scheduler.ts:213</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -537,13 +1041,36 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/24fda0e/src/Scheduler.ts#L87">Scheduler.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/plastic-io/plastic-io/blob/1316737/src/Scheduler.ts#L282">Scheduler.ts:282</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Navigate to a given vector via vector URL</p>
+									<a href="#simple-vector-edge-invocation" id="simple-vector-edge-invocation" style="color: inherit; text-decoration: none;">
+										<h3>Simple Vector Edge Invocation</h3>
+									</a>
 								</div>
+								<p>Invoke a Vector&#39;s Edge (set function).</p>
+								<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON);
+  scheduler.url(<span class="hljs-string">"my-graph-url"</span>);</code></pre>
+								<a href="#invoke-edge-with-value" id="invoke-edge-with-value" style="color: inherit; text-decoration: none;">
+									<h3>Invoke Edge with Value</h3>
+								</a>
+								<p>Invoke a Vector&#39;s Edge (set function), and send a value to the edge.</p>
+								<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON);
+  scheduler.url(<span class="hljs-string">"my-graph-url"</span>, <span class="hljs-string">"some value"</span>);</code></pre>
+								<a href="#invoke-edge-with-value-and-field" id="invoke-edge-with-value-and-field" style="color: inherit; text-decoration: none;">
+									<h3>Invoke Edge with Value, and Field</h3>
+								</a>
+								<p>Invoke a Vector&#39;s Edge (set function), and send a value to the edge.</p>
+								<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON);
+  scheduler.url(<span class="hljs-string">"my-graph-url"</span>, <span class="hljs-string">"some value"</span>, <span class="hljs-string">"some_field"</span>);</code></pre>
+								<a href="#advanced-pass-previous-execution-context" id="advanced-pass-previous-execution-context" style="color: inherit; text-decoration: none;">
+									<h3>Advanced: Pass Previous Execution Context</h3>
+								</a>
+								<p>By passing a vector instance, you can invoke vectors embedded in inner graphs.</p>
+								<pre><code class="language-TypeScript">  <span class="hljs-keyword">const</span> scheduler = <span class="hljs-keyword">new</span> Scheduler(myGraphJSON);
+  scheduler.url(<span class="hljs-string">"my-graph-url"</span>, <span class="hljs-string">"some value"</span>, <span class="hljs-string">"some_field"</span>, myInnerVectorInstance);</code></pre>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -601,6 +1128,39 @@
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-external">
 								<a href="_scheduler_.scheduler.html#constructor" class="tsd-kind-icon">constructor</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#afterset" class="tsd-kind-icon">after<wbr>Set</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#begin" class="tsd-kind-icon">begin</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#beginconnector" class="tsd-kind-icon">beginconnector</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#beginedge" class="tsd-kind-icon">beginedge</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#end" class="tsd-kind-icon">end</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#endconnector" class="tsd-kind-icon">endconnector</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#endedge" class="tsd-kind-icon">endedge</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#error" class="tsd-kind-icon">error</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#load" class="tsd-kind-icon">load</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#set" class="tsd-kind-icon">set</a>
+							</li>
+							<li class=" tsd-kind-event tsd-parent-kind-class tsd-is-external">
+								<a href="_scheduler_.scheduler.html#warning" class="tsd-kind-icon">warning</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-external">
 								<a href="_scheduler_.scheduler.html#context" class="tsd-kind-icon">context</a>
