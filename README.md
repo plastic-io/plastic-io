@@ -35,6 +35,6 @@ This program can execute graphs written in the application/json+plastic-io schem
     scheduler.url("url-of-a-vector", "some value");
 ```
 
-For more useage see the plastic-io documentation.
+For more useage see [Scheduler](https://plastic-io.github.io/plastic-io/classes/_scheduler_.scheduler.html)
 
 To create, run and debug graphs, use the plastic-io/graph-editor and the plastic-io/graph-server
