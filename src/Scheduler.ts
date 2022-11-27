@@ -15,8 +15,8 @@ import Loader from "./Loader";
  * If you want to implement the scheduler yourself and run graphs in your own way, then you have come to the right place!
  *
  * To begin the execution of a graph, you must first instantiate your graph in the Scheduler.
- * See the {@link Scheduler.constructor} for more information on instantiation.  After you instantiate
- * the scheduler, you can call {@link Scheduler.url} to directly invoke a node's edge (set function).
+ * See the {@link default.constructor} for more information on instantiation.  After you instantiate
+ * the scheduler, you can call {@link default.url} to directly invoke a node's edge (set function).
  *
  * ## Graph
  * {@link Graph}s contain arrays of {@link Node}s.  Nodes are executable units of code and can be local to the graph, or reference other nodes or graphs.
@@ -59,7 +59,7 @@ import Loader from "./Loader";
  */
 export default class Scheduler {
     /**
-     * Occurs when the graph begins to navigate to a node's URL via the {@link Scheduler.url} function.
+     * Occurs when the graph begins to navigate to a node's URL via the {@link default.url} function.
      * @event
      */
     begin: (e: SchedulerEvent) => void;

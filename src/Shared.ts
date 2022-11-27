@@ -209,7 +209,7 @@ export function newId(): string {
  * This map makes specified edges on the internal graph connectable on the host graph via edges that will
  * appear on the linked graph.
  *
- * To "start" a graph you typically point {@link Scheduler.url} at a {@link Node.url}, which will invoke the Node's set function ({@link NodeTemplate.set})
+ * To "start" a graph you typically point {@link default.url} at a {@link Node.url}, which will invoke the Node's set function ({@link NodeTemplate.set})
  */
 export interface Graph {
     id: string;
