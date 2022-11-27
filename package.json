@@ -3,7 +3,7 @@
     "license": "BSD-3-Clause",
     "author": "TonyGermaneri@gmail.com",
     "private": false,
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "JavaScript graph programming lanague.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
