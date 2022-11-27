@@ -5,11 +5,11 @@ import {
     LoadEvent,
     Connector,
     FieldMap,
-    VectorTemplate,
-    LinkedVector,
+    NodeTemplate,
+    LinkedNode,
     LinkedGraph,
-    VectorInterface,
-    VectorSetEvent,
+    NodeInterface,
+    NodeSetEvent,
     Logger,
     Graph,
     newId,
@@ -22,23 +22,23 @@ import {
 } from "./Shared";
 import Scheduler from "./Scheduler";
 import Edge from "./Edge";
-import Vector, {linkInnerVectorEdges, getLinkedInputs} from "./Vector";
+import Node, {linkInnerNodeEdges, getLinkedInputs} from "./Node";
 import Loader from "./Loader";
 export default Scheduler;
 export {
     getLinkedInputs,
-    linkInnerVectorEdges,
+    linkInnerNodeEdges,
     Loader,
-    Vector,
+    Node,
     Edge,
     LoadEvent,
     Connector,
     FieldMap,
-    VectorTemplate,
-    LinkedVector,
+    NodeTemplate,
+    LinkedNode,
     LinkedGraph,
-    VectorInterface,
-    VectorSetEvent,
+    NodeInterface,
+    NodeSetEvent,
     Logger,
     Graph,
     newId,

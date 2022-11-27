@@ -1,10 +1,10 @@
-import Vector from "./Vector";
+import Node from "./Node";
 import Scheduler from "./Scheduler";
 /**
- * Occurs when a linked vector or graph are loaded.
+ * Occurs when a linked node or graph are loaded.
  * The fetch function in the global scope is used to fetch URLs.
  * This behavior can be overridden by adding an event listener to
- * the load even and calling 'setValue' with the Vector or Graph
+ * the load even and calling 'setValue' with the Node or Graph
  * requested.
  *
  * ```typescript
@@ -18,33 +18,33 @@ import Scheduler from "./Scheduler";
 export interface LoadEvent extends SchedulerEvent {
     /** The unique UUID of the event */
     id: string;
-    /** Calling the setValue function will set the linked graph or vector and
+    /** Calling the setValue function will set the linked graph or node and
      * stop the default global fetch function from being called
      */
     setValue: Function; // tslint:disable-line
     /** The url of the artifact */
     url: string;
 }
-/** Occurs when data is sent to a vector via an edge connector. */
+/** Occurs when data is sent to a node via an edge connector. */
 export interface ConnectorEvent extends SchedulerEvent {
     connector: Connector;
 }
-/** Connects two vector edges together */
+/** Connects two node edges together */
 export interface Connector {
     /** Unique id of the connector */
     id: string;
-    /** Vector.id this connector connects to */
-    vectorId: string;
+    /** Node.id this connector connects to */
+    nodeId: string;
     /** Edge name this connector connects to */
     field: string;
-    /** The graph id the vector belongs to */
+    /** The graph id the node belongs to */
     graphId: string;
-    /** The graph version this vector belongs to */
+    /** The graph version this node belongs to */
     version: number;
 }
-/** Maps a host vector's edges to the edges on the inner graph */
+/** Maps a host node's edges to the edges on the inner graph */
 export interface FieldMap {
-    /** The vector ID this field mapping belongs to */
+    /** The node ID this field mapping belongs to */
     id: string;
     /** The edge name this field mapping belong to */
     field: string;
@@ -54,22 +54,22 @@ export interface FieldMap {
     external: boolean;
 }
 /**
- * Used to host vector template data.  Unless extended to contain
+ * Used to host node template data.  Unless extended to contain
  * other templates, for example Vue or React templates, this interface will only
  * contain the main set property that hold ESNEXT source code that runs
- * when the vector's setter is set
+ * when the node's setter is set
  */
-export interface VectorTemplate {
+export interface NodeTemplate {
     set: string;
 }
-/** Used internally to represent a linked vector */
-export interface LinkedVector {
-    /** The vector.id of the linked vector */
+/** Used internally to represent a linked node */
+export interface LinkedNode {
+    /** The node.id of the linked node */
     id: string;
-    /** The version number of the linked vector */
+    /** The version number of the linked node */
     version: number;
-    /** Once loaded, the linked vector is stored here */
-    vector?: Vector;
+    /** Once loaded, the linked node is stored here */
+    node?: Node;
     /** When loaded, this value is true, otherwise, it is false. */
     loaded: boolean;
 }
@@ -101,61 +101,61 @@ export interface LinkedGraph {
         };
     };
 }
-/** Interface provided to vector set methods at runtime */
-export interface VectorInterface {
+/** Interface provided to node set methods at runtime */
+export interface NodeInterface {
     /** The scheduler */
     scheduler: Scheduler;
-    /** The vector being set */
-    vector: Vector;
+    /** The node being set */
+    node: Node;
     /** The name of the edge being set */
     field: string;
     /** The value passed to the edge */
     value: any;
-    /** All edges on this vector */
+    /** All edges on this node */
     edges: object;
     /** The state object on this scheduler */
     state: object;
-    /** The vector specific cache object */
+    /** The node specific cache object */
     cache: object;
-    /** The graph that this vector belongs to */
+    /** The graph that this node belongs to */
     graph: Graph;
     /**
-     * Data associated with this vector.  Data can be any type, it depends on
-     * the vector author's purpose for the vector.  Data is meant to be
-     * non volatile information related to the domain of this vector.
+     * Data associated with this node.  Data can be any type, it depends on
+     * the node author's purpose for the node.  Data is meant to be
+     * non volatile information related to the domain of this node.
      */
     data: any;
     /**
-     * Properties associated with this vector.  Properties is used by
-     * the graph domain user interface or other non volatile graph or vector
+     * Properties associated with this node.  Properties is used by
+     * the graph domain user interface or other non volatile graph or node
      * domain interfaces.
      */
     properties: object;
     /**
-     * User setable vector set context (value of `this` during set).
-     * this is setable on a per vector set instance basis by subscribing to
+     * User setable node set context (value of `this` during set).
+     * this is setable on a per node set instance basis by subscribing to
      * set and running e.setContext.
      */
     context: any;
 }
 /**
- * This event is dispatched before and after vector set code has been executed.
- * The global return value for the vector set code can be found here.
+ * This event is dispatched before and after node set code has been executed.
+ * The global return value for the node set code can be found here.
  */
-export interface VectorSetEvent extends SchedulerEvent {
+export interface NodeSetEvent extends SchedulerEvent {
     /** If present, an error occurred and this is the error. */
     err?: Error;
     /**
      * Return value if any.  This requires the set function
      * to return in the global scope.  This has no impact on graph execution,
-     * the value does not connect to other vectors.  This value is only present
+     * the value does not connect to other nodes.  This value is only present
      * on the afterSet event.
      */
     return?: any;
-    /** The vector interface passed to the set function. */
-    vectorInterface: VectorInterface;
-    /** The vectorId where the set event occured */
-    vectorId: string;
+    /** The node interface passed to the set function. */
+    nodeInterface: NodeInterface;
+    /** The nodeId where the set event occured */
+    nodeId: string;
     /** The graphId where the set event occured */
     graphId: string;
     /** The field where the set event occured */
@@ -200,21 +200,21 @@ export function newId(): string {
     });
 }
 /**
- * Graphs are the containers of your Plastic-IO programs.  Graphs contain a collection of {@link Vector}s.
- * Vectors contain a unit of executable code, along with view, test and any other code templates that
- * constitute the functionality of the unit of code.  See {@link Vector} for more information.
+ * Graphs are the containers of your Plastic-IO programs.  Graphs contain a collection of {@link Node}s.
+ * Nodes contain a unit of executable code, along with view, test and any other code templates that
+ * constitute the functionality of the unit of code.  See {@link Node} for more information.
  *
- * Graphs can be linked into other graphs.  When linked, the graph appears to be a vector on the host graph.
- * A special map (See {@link Vector.linkedGraph}, {@link LinkedGraph.fields}) is created based on any Vector edges with the boolean value `external` set to true.
+ * Graphs can be linked into other graphs.  When linked, the graph appears to be a node on the host graph.
+ * A special map (See {@link Node.linkedGraph}, {@link LinkedGraph.fields}) is created based on any Node edges with the boolean value `external` set to true.
  * This map makes specified edges on the internal graph connectable on the host graph via edges that will
  * appear on the linked graph.
  *
- * To "start" a graph you typically point {@link Scheduler.url} at a {@link Vector.url}, which will invoke the Vector's set function ({@link VectorTemplate.set})
+ * To "start" a graph you typically point {@link Scheduler.url} at a {@link Node.url}, which will invoke the Node's set function ({@link NodeTemplate.set})
  */
 export interface Graph {
     id: string;
     url: string;
-    vectors: Vector[];
+    nodes: Node[];
     properties: GraphProperties;
     version: number;
 }
@@ -241,9 +241,9 @@ export interface GraphProperties {
 }
 /** Data generated by the initial invocation of the graph. */
 export interface ExecutionResult {
-    vectors: Vector[];
+    nodes: Node[];
 }
-/** An event emitted during vector invocation scheduling. */
+/** An event emitted during node invocation scheduling. */
 export interface SchedulerEvent {
     /** Unique ID of the event */
     id: string;
@@ -256,8 +256,8 @@ export interface SchedulerEvent {
 export interface EdgeError extends SchedulerEvent {
     /** Standard error */
     err: Error;
-    /** The vector the error occured on */
-    vectorId?: string;
+    /** The node the error occured on */
+    nodeId?: string;
 }
 /** Not an error. */
 export interface Warning extends SchedulerEvent {

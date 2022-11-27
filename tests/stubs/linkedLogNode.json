@@ -1,16 +1,18 @@
 {
-    "vectors": [
+    "nodes": [
         {
             "id": "1",
+            "linkedNode": {
+                "id": "1234",
+                "version": 0
+            },
             "edges": [],
             "version": 0,
             "graphId": "0",
             "url": "index",
             "data": "",
             "properties": {},
-            "template": {
-                "set": "console.info(value);"
-            }
+            "template": {}
         }
     ],
     "id": "0",

@@ -1,5 +1,5 @@
 {
-    "vectors": [
+    "nodes": [
         {
             "id": "1",
             "edges": [
@@ -8,14 +8,14 @@
                     "connectors": [
                         {
                             "id": "0",
-                            "vectorId": "2",
+                            "nodeId": "2",
                             "field": "proxy",
                             "graphId": "0",
                             "version": 0
                         },
                         {
                             "id": "0",
-                            "vectorId": "3",
+                            "nodeId": "3",
                             "field": "proxy",
                             "graphId": "0",
                             "version": 0
