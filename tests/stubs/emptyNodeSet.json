@@ -1,5 +1,5 @@
 {
-    "vectors": [
+    "nodes": [
         {
             "id": "1",
             "edges": [],
@@ -9,7 +9,7 @@
             "data": "",
             "properties": {},
             "template": {
-                "set": "return Math.cos(value)"
+                "set": ""
             }
         }
     ],

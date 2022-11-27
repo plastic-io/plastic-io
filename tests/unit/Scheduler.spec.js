@@ -3,10 +3,10 @@ const fetchMock = require("../mocks/fetch.js"); // eslint-disable-line
 const Scheduler = require("../../dist/index.js").default;
 const stubs = {};
 function linkStubs() { // eslint-disable-line
-    ["emptyGraph", "singleLogVector", "proxyToLog", "linkedGraph", "linkedCycleInner",
-        "linkedCycleOuter", "linkedLogVector", "proxyToLog", "publishedLogVector",
-        "badVectorConnector", "badVectorSet", "emptyVectorSet", "malformedSchema",
-        "malformedSchemaSubGraphMap", "mathCosVector", "cacheLinkedGraph"].forEach((key) => {
+    ["emptyGraph", "singleLogNode", "proxyToLog", "linkedGraph", "linkedCycleInner",
+        "linkedCycleOuter", "linkedLogNode", "proxyToLog", "publishedLogNode",
+        "badNodeConnector", "badNodeSet", "emptyNodeSet", "malformedSchema",
+        "malformedSchemaSubGraphMap", "mathCosNode", "cacheLinkedGraph"].forEach((key) => {
         stubs[key] = JSON.parse(JSON.stringify(require("../stubs/"+ key + ".json"))); // eslint-disable-line
     });
     global.fetch = undefined;
@@ -28,15 +28,15 @@ describe("Basic scheduler functions", () => {
         expect(scheduler).toBeInstanceOf(Scheduler);
         return done();
     });
-    it("Should load a graph that has a single vector that executes when navigated to", (done) => {
-        const scheduler = new Scheduler(stubs.singleLogVector);
+    it("Should load a graph that has a single node that executes when navigated to", (done) => {
+        const scheduler = new Scheduler(stubs.singleLogNode);
         const testVal = getTestValue();
         global.console.info = jest.fn();
         scheduler.url("index", testVal);
         expect(global.console.info).toHaveBeenCalledWith(testVal);
         return done();
     });
-    it("Should load a graph that has a two vectors.  One that proxies a message to a log vector", (done) => {
+    it("Should load a graph that has a two nodes.  One that proxies a message to a log node", (done) => {
         const scheduler = new Scheduler(stubs.proxyToLog);
         const testVal = getTestValue();
         global.console.info = jest.fn();
@@ -47,7 +47,7 @@ describe("Basic scheduler functions", () => {
 });
 describe("Scheduler graph linking input and output connectors", () => {
     beforeEach(linkStubs);
-    it("Should load a graph that has a linked graph vector that links a proxy log graph", (done) => {
+    it("Should load a graph that has a linked graph node that links a proxy log graph", (done) => {
         const scheduler = new Scheduler(stubs.linkedGraph);
         global.fetch = fetchMock(() => {
             return stubs.proxyToLog;
@@ -60,7 +60,7 @@ describe("Scheduler graph linking input and output connectors", () => {
             return done();
         });
     });
-    it("Should load a graph that has a linked graph vector that links a proxy log graph, call a second time, and expect to only have fetch called once proving the cache works.", (done) => {
+    it("Should load a graph that has a linked graph node that links a proxy log graph, call a second time, and expect to only have fetch called once proving the cache works.", (done) => {
         const scheduler = new Scheduler(stubs.linkedGraph);
         let fetchCount = 0;
         global.fetch = fetchMock(() => {
@@ -78,7 +78,7 @@ describe("Scheduler graph linking input and output connectors", () => {
             });
         });
     });
-    it("Should load a graph that has a linked graph vector that links a proxy log graph, call a second time, and expect to have fetch called twice proving clearCache works.", (done) => {
+    it("Should load a graph that has a linked graph node that links a proxy log graph, call a second time, and expect to have fetch called twice proving clearCache works.", (done) => {
         const scheduler = new Scheduler(stubs.cacheLinkedGraph, {}, {});
         let fetchCount = 0;
         global.fetch = fetchMock(() => {
@@ -94,7 +94,7 @@ describe("Scheduler graph linking input and output connectors", () => {
             });
         });
     });
-    it("Should load a graph that has a linked graph vector that links a proxy that then links to an output vector that links to a log vector on the input graph", (done) => {
+    it("Should load a graph that has a linked graph node that links a proxy that then links to an output node that links to a log node on the input graph", (done) => {
         const scheduler = new Scheduler(stubs.linkedCycleOuter);
         global.fetch = fetchMock((path) => {
             if (/inner/.test(path)) {
@@ -110,7 +110,7 @@ describe("Scheduler graph linking input and output connectors", () => {
             return done();
         });
     });
-    it("Should load a graph that has a linked graph vector that links a proxy log graph and override the inner graph data with another value", (done) => {
+    it("Should load a graph that has a linked graph node that links a proxy log graph and override the inner graph data with another value", (done) => {
         const scheduler = new Scheduler(stubs.linkedGraph);
         global.fetch = fetchMock(() => {
             return stubs.proxyToLog;
@@ -124,12 +124,12 @@ describe("Scheduler graph linking input and output connectors", () => {
         });
     });
 });
-describe("Scheduler vector linking", () => {
+describe("Scheduler node linking", () => {
     beforeEach(linkStubs);
-    it("Should load a graph that has a linked log vector", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+    it("Should load a graph that has a linked log node", (done) => {
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         global.fetch = fetchMock(() => {
-            return stubs.publishedLogVector;
+            return stubs.publishedLogNode;
         });
         const testVal = getTestValue();
         global.console.info = jest.fn();
@@ -143,17 +143,17 @@ describe("Scheduler vector linking", () => {
 describe("Scheduler event emitter and scheduler sequence validation", () => {
     beforeEach(linkStubs);
     it("Should emit a begin event when the url method is called.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         scheduler.addEventListener("begin", () => {
             return done();
         });
         scheduler.url("index");
     });
     it("Should load a graph via the event emitter's load method.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector, {}, {}, stubs.console);
+        const scheduler = new Scheduler(stubs.linkedLogNode, {}, {}, stubs.console);
         scheduler.addEventListener("load", (e) => {
-            expect(e.url).toEqual("artifacts/vectors/1234.0");
-            e.setValue(stubs.publishedLogVector);
+            expect(e.url).toEqual("artifacts/nodes/1234.0");
+            e.setValue(stubs.publishedLogNode);
         });
         scheduler.url("index");
         setTimeout(() => {
@@ -162,7 +162,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         });
     });
     it("Should emit an end event after the begin event when the url method is called.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         const seq = [];
         scheduler.addEventListener("begin", () => {
             seq.push("begin");
@@ -175,7 +175,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.url("index");
     });
     it("Should be able to remove event listeners.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         const seq = [];
         function begin() { // eslint-disable-line
             seq.push("begin");
@@ -190,7 +190,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.url("index");
     });
     it("Should be able to remove from events that do not exist without throwing an error.", (done) => {
-        const scheduler = new Scheduler(stubs.singleLogVector);
+        const scheduler = new Scheduler(stubs.singleLogNode);
         const seq = [];
         function begin() { // eslint-disable-line
             seq.push("begin");
@@ -204,7 +204,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.url("index");
     });
     it("Should be able to remove event listeners that are not bound without throwing an error.", (done) => {
-        const scheduler = new Scheduler(stubs.singleLogVector);
+        const scheduler = new Scheduler(stubs.singleLogNode);
         const seq = [];
         function begin() { // eslint-disable-line
             seq.push("begin");
@@ -222,15 +222,15 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.url("index");
     });
     it("Should emit a warning event when there is no URL match.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         scheduler.addEventListener("warning", (e) => {
-           expect(e.message).toEqual("Cannot find vector at the specified URL.");
+           expect(e.message).toEqual("Cannot find node at the specified URL.");
            return done();
         });
         scheduler.url("not-here");
     });
     it("Should emit a begin, beginedge, end, then endedge.", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector);
+        const scheduler = new Scheduler(stubs.linkedLogNode);
         const seq = [];
         scheduler.addEventListener("begin", () => {
             seq.push("begin");
@@ -250,7 +250,7 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         });
     });
     it("Should emit a begin, beginedge, end, set, then endedge.  Return data should be -0.8390715290764524 (Math.cos(10))", (done) => {
-        const scheduler = new Scheduler(stubs.mathCosVector);
+        const scheduler = new Scheduler(stubs.mathCosNode);
         const seq = [];
         scheduler.addEventListener("begin", () => {
             seq.push("begin");
@@ -285,7 +285,7 @@ describe("Scheduler error states and matching error events", () => {
         return done();
     });
     it("Should throw an error if a fetch is attempted but fetch is not defined", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector, {}, {}, stubs.console);
+        const scheduler = new Scheduler(stubs.linkedLogNode, {}, {}, stubs.console);
         const evs = [];
         global.fetch = undefined;
         scheduler.addEventListener("error", (e) => {
@@ -299,8 +299,8 @@ describe("Scheduler error states and matching error events", () => {
             return done();
         });
     });
-    it("Should log an error if the remote vector is undefined", (done) => {
-        const scheduler = new Scheduler(stubs.linkedLogVector, {}, {}, stubs.console);
+    it("Should log an error if the remote node is undefined", (done) => {
+        const scheduler = new Scheduler(stubs.linkedLogNode, {}, {}, stubs.console);
         global.fetch = fetchMock(() => {
             return;
         });
@@ -310,7 +310,7 @@ describe("Scheduler error states and matching error events", () => {
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Vector: Critical Error: Linked vector not found on vector.id: 1";
+            const match = "Error: Node: Critical Error: Linked node not found on node.id: 1";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();
@@ -327,49 +327,49 @@ describe("Scheduler error states and matching error events", () => {
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Edge: Error occured during vector.execute: Error: Critical Error: Linked graph not found on vector.id: 2";
+            const match = "Error: Edge: Error occured during node.execute: Error: Critical Error: Linked graph not found on node.id: 2";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();
         });
     });
-    it("Should log an error if a connector refers to a vector that does not exist", (done) => {
-        const scheduler = new Scheduler(stubs.badVectorConnector, {}, {}, stubs.console);
+    it("Should log an error if a connector refers to a node that does not exist", (done) => {
+        const scheduler = new Scheduler(stubs.badNodeConnector, {}, {}, stubs.console);
         const evs = [];
         scheduler.addEventListener("error", (e) => {
             evs.push(e);
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Connector refers to a vector edge that does not exist.  Connector.id: 0";
+            const match = "Error: Connector refers to a node edge that does not exist.  Connector.id: 0";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();
         });
     });
     it("Should log an error if a set template is empty", (done) => {
-        const scheduler = new Scheduler(stubs.emptyVectorSet, {}, {}, stubs.console);
+        const scheduler = new Scheduler(stubs.emptyNodeSet, {}, {}, stubs.console);
         const evs = [];
         scheduler.addEventListener("error", (e) => {
             evs.push(e);
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Vector: No template for set found on vector.id 1";
+            const match = "Error: Node: No template for set found on node.id 1";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();
         });
     });
     it("Should log an error if a set template causes an error", (done) => {
-        const scheduler = new Scheduler(stubs.badVectorSet, {}, {}, stubs.console);
+        const scheduler = new Scheduler(stubs.badNodeSet, {}, {}, stubs.console);
         const evs = [];
         scheduler.addEventListener("afterSet", (e) => {
             evs.push(e.err.toString());
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Vector: set function caused an error: ReferenceError: x is not defined";
+            const match = "Node: set function caused an error: ReferenceError: x is not defined";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             return done();
         });
@@ -382,7 +382,7 @@ describe("Scheduler error states and matching error events", () => {
         });
         scheduler.url("index");
         setTimeout(() => {
-            const match = "Error: Vector: Edge setter error. field proxy, vector.id 1";
+            const match = "Error: Node: Edge setter error. field proxy, node.id 1";
             expect(stubs.console.error.mock.calls[0][0]).toMatch(match);
             expect(evs[0].message).toMatch(match);
             return done();

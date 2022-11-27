@@ -17,12 +17,12 @@ This program can execute graphs written in the application/json+plastic-io schem
 
 * Just in time loading and compiling of:
     - graph
-    - vectors
+    - nodess
     - embedded graphs
     - ES6 code
 * Event emitter shows detailed graph execution data
 * Graphs can be published, linked and embedded in other graphs
-* Vectors can be published and linked
+* Nodes can be published and linked
 * Graphs support templating engines to create UIs using various frameworks (e.g.: Vue, React)
 
 ## Basic Usage
@@ -32,7 +32,7 @@ This program can execute graphs written in the application/json+plastic-io schem
     import {Scheduler} from "plastic-io";
     // instantiate the scheduler
     const scheduler = new Scheduler(myGraphJson);
-    scheduler.url("url-of-a-vector", "some value");
+    scheduler.url("url-of-a-node", "some value");
 ```
 
 For more useage see [Scheduler](https://plastic-io.github.io/plastic-io/classes/_scheduler_.scheduler.html)
