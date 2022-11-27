@@ -306,7 +306,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
         log.debug(`Node: Parse and run template for node.id: ${node.id} template length ${vect.template.set.length}`);
         try {
             setResult = await parseAndRun(vect.template.set, nodeInterface);
-        } catch (err) {
+        } catch (err: any) {
             er = err;
             scheduler.logger.error(`Node: set function caused an error: ${err.stack}`);
             scheduler.dispatchEvent("error", {

@@ -17,7 +17,7 @@ This program can execute graphs written in the application/json+plastic-io schem
 
 * Just in time loading and compiling of:
     - graph
-    - nodess
+    - nodes
     - embedded graphs
     - ES6 code
 * Event emitter shows detailed graph execution data
