@@ -308,7 +308,15 @@ export default class Scheduler {
         }
         if (node) {
             this.logger.info("Executing node at URL " + url);
-            await execute(this, graph, node, field, value);
+            try {
+                await execute(this, graph, node, field, value);
+            } catch (err) {
+                this.dispatchEvent("error", {
+                    time: Date.now(),
+                    id: newId(),
+                    err,
+                } as EdgeError);
+            }
         }
         this.dispatchEvent("end", {
             url,
