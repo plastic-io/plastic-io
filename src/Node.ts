@@ -60,45 +60,62 @@ export default interface Node {
     __contextId: any;
 }
 /** Utility to parse and run nodes.  Used internally to run the node's set function. */
-async function parseAndRun(code: string, nodeInterface: NodeInterface): Promise<any> {
-    const ast = parseScript(code, {
-        loc: true,
-        module: true,
-        next: true,
-        globalReturn: true,
+function parseAndRun(code: string, nodeInterface: NodeInterface): Promise<any> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const ast = parseScript(code, {
+                loc: true,
+                module: true,
+                next: true,
+                globalReturn: true,
+            });
+
+            // tslint:disable-next-line
+            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor; // eslint-disable-line 
+            const nodeFn = new AsyncFunction("scheduler", "graph", "cache", "node", "field",
+                "state", "value", "edges", "data", "properties", "require", generate(ast));
+            nodeInterface.scheduler.dispatchEvent("set", {
+                id: newId(),
+                nodeId: nodeInterface.node.id,
+                graphId: nodeInterface.node.graphId,
+                field: nodeInterface.field,
+                time: Date.now(),
+                nodeInterface,
+                setContext(val: any) {
+                    nodeInterface.scheduler.logger.debug(`Node: setContext setting context of node.`);
+                    nodeInterface.context = val;
+                },
+            } as NodeSetEvent);
+            nodeInterface.scheduler.logger.debug(`Node: about to execute compiled function.`);
+            Promise.resolve(nodeFn.call(
+                nodeInterface.context,
+                nodeInterface.scheduler,
+                nodeInterface.graph,
+                nodeInterface.cache,
+                nodeInterface.node,
+                nodeInterface.field,
+                nodeInterface.state,
+                nodeInterface.value,
+                nodeInterface.edges,
+                nodeInterface.data,
+                nodeInterface.properties,
+                (path: any) => {
+                    return eval("require")(path); // tslint:disable-line
+                },
+            ))
+            .then(result => {
+                nodeInterface.scheduler.logger.debug(`Node: just executed compiled function without error.`);
+                resolve(result);
+            })
+            .catch(error => {
+                nodeInterface.scheduler.logger.debug(`Node: just executed compiled function with error ${error}.`);
+                reject(error);
+            });
+        } catch (error) {
+            nodeInterface.scheduler.logger.debug(`Node: caught an error while script parsing: ${error}.`);
+            reject(error);
+        }
     });
-    // tslint:disable-next-line
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor; // eslint-disable-line 
-    const nodeFn = new AsyncFunction("scheduler", "graph", "cache", "node", "field",
-        "state", "value", "edges", "data", "properties", "require", generate(ast));
-    nodeInterface.scheduler.dispatchEvent("set", {
-        id: newId(),
-        nodeId: nodeInterface.node.id,
-        graphId: nodeInterface.node.graphId,
-        field: nodeInterface.field,
-        time: Date.now(),
-        nodeInterface,
-        setContext(val: any) {
-            nodeInterface.scheduler.logger.debug(`Node: setContext setting context of node.`);
-            nodeInterface.context = val;
-        },
-    } as NodeSetEvent);
-    return await nodeFn.call(
-        nodeInterface.context,
-        nodeInterface.scheduler,
-        nodeInterface.graph,
-        nodeInterface.cache,
-        nodeInterface.node,
-        nodeInterface.field,
-        nodeInterface.state,
-        nodeInterface.value,
-        nodeInterface.edges,
-        nodeInterface.data,
-        nodeInterface.properties,
-        (path: any) => {
-            return eval("require")(path); // tslint:disable-line
-        },
-    );
 }
 /** Utility to connect linked nodes and the host graph's node.  Used internally. */
 export function getLinkedInputs(vect: Node, field: string, scheduler: Scheduler): any {
@@ -242,15 +259,28 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                                 connector,
                                 value: val,
                             } as ConnectorEvent);
-                            await edgeExecute(scheduler, graph, nodeNext, connector.field, val);
-                            const end = Date.now();
-                            scheduler.dispatchEvent("endconnector", {
-                                time: end,
-                                duration: end - start,
-                                id: newId(),
-                                connector,
-                                value: val,
-                            } as ConnectorEvent);
+                            edgeExecute(scheduler, graph, nodeNext, connector.field, val).then(() => {
+                                const end = Date.now();
+                                scheduler.dispatchEvent("endconnector", {
+                                    time: end,
+                                    duration: end - start,
+                                    id: newId(),
+                                    connector,
+                                    value: val,
+                                } as ConnectorEvent);
+                            }).catch((err) => {
+                                log.error(err.stack);
+                                scheduler.dispatchEvent("error", {
+                                    id: newId(),
+                                    time: Date.now(),
+                                    err,
+                                    message: err.toString(),
+                                    edgeField: edge.field,
+                                    connectorId: connector.id,
+                                    nodeId: vect.id,
+                                    graphId: graph.id,
+                                } as EdgeError);
+                            });
                         } else {
                             const err = new Error(`Connector refers to a node edge that does not exist.  Connector.id: ${connector.id}`);
                             log.error(err.stack);
@@ -267,9 +297,9 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                         }
                     }
                 }
-                try {
-                    await setter(setterVal);
-                } catch(err) {
+                setter(setterVal).then(() => {
+                    log.debug('Async setter completed successfully.');
+                }).catch((err) => {
                     const er = new Error(`Node: Edge setter error. field ${edge.field}, node.id ${vect.id}. Error: ${err}`);
                     log.error(er.stack);
                     scheduler.dispatchEvent("error", {
@@ -281,7 +311,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                         nodeId: vect.id,
                         graphId: graph.id,
                     } as EdgeError);
-                }
+                });
             }
         });
     });
@@ -301,13 +331,16 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
         properties: vect.properties,
     } as NodeInterface;
     if (vect.template.set) {
-        let er;
-        let setResult: any;
         log.debug(`Node: Parse and run template for node.id: ${node.id} template length ${vect.template.set.length}`);
-        try {
-            setResult = await parseAndRun(vect.template.set, nodeInterface);
-        } catch (err: any) {
-            er = err;
+        parseAndRun(vect.template.set, nodeInterface).then((setResult: any) => {
+            scheduler.dispatchEvent("afterSet", {
+                id: newId(),
+                return: setResult,
+                time: Date.now(),
+                nodeInterface,
+            } as NodeSetEvent);
+        }).catch((err) => {
+            const er = err;
             scheduler.logger.error(`Node: set function caused an error: ${err.stack}`);
             scheduler.dispatchEvent("error", {
                 id: newId(),
@@ -318,14 +351,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                 graphId: graph.id,
                 field,
             } as EdgeError);
-        }
-        scheduler.dispatchEvent("afterSet", {
-            id: newId(),
-            err: er,
-            return: setResult,
-            time: Date.now(),
-            nodeInterface,
-        } as NodeSetEvent);
+        });
     } else if (!vect.linkedGraph) {
         const err = new Error(`Node: No template for set found on node.id ${node.id}`);
         scheduler.logger.error(err.stack);
