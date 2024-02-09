@@ -244,7 +244,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                 async function setter(val: any): Promise<void> {
                     log.debug(`Node: Edge setter invoked. field ${edge.field}, edge.connectors.length ${edge.connectors.length}, node.id ${vect.id}, graph.id, ${graph.id}`);
                     for (const connector of edge.connectors) {
-                        if (connector.graphId !== graph.id || connector.version !== graph.version) {
+                        if (connector.graphId !== graph.id) {
                             graph = await scheduler.graphLoader.load(scheduler.getGraphPath(connector.graphId, connector.version));
                         }
                         const nodeNext = graph.nodes.find((v: Node) => {
