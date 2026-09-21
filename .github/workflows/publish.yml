@@ -43,6 +43,11 @@ jobs:
           else
             echo "publish=true" >> "$GITHUB_OUTPUT"
           fi
+      - name: Show what trusted publishing will see
+        run: |
+          echo "npm $(npm --version) on node $(node --version)"
+          echo "repository: $GITHUB_REPOSITORY  workflow: $GITHUB_WORKFLOW_REF  ref: $GITHUB_REF"
+          echo "OIDC token request url present: $([ -n "$ACTIONS_ID_TOKEN_REQUEST_URL" ] && echo yes || echo no)"
       - name: Stage on npm (awaits approval on npmjs.com)
         if: steps.check.outputs.publish == 'true'
-        run: npm stage publish --access public
+        run: npm stage publish --access public --loglevel verbose
