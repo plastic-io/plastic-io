@@ -13,15 +13,15 @@
         "README.md"
     ],
     "scripts": {
-        "build": "./node_modules/.bin/tsc",
-        "lint": "./node_modules/.bin/tslint -p tsconfig.json",
-        "pretest": "./node_modules/.bin/tsc",
-        "test": "./node_modules/.bin/jest",
-        "build-docs": "./node_modules/.bin/typedoc ./src"
+        "build": "tsc",
+        "lint": "tslint -p tsconfig.json",
+        "pretest": "tsc",
+        "test": "jest",
+        "build-docs": "typedoc ./src"
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:plastic-io/plastic-io.git"
+        "url": "git+ssh://git@github.com/plastic-io/plastic-io.git"
     },
     "devDependencies": {
         "@babel/core": "^7.9.6",

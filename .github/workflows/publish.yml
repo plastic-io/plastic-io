@@ -23,7 +23,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          # no registry-url: setup-node would write an empty _authToken and
+          # always-auth into .npmrc, and npm would use that instead of OIDC
       - name: Use an npm that knows staged publishing (11.15+)
         run: npm install -g npm@latest && npm --version
       - name: Build and test
