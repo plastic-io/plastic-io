@@ -249,7 +249,8 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
             done();
         });
     });
-    it("Should emit a begin, beginedge, end, set, then endedge.  Return data should be -0.8390715290764524 (Math.cos(10))", (done) => {
+    it("Should emit begin, beginedge, afterSet (with the return value), endedge, then end.  Return data should be -0.8390715290764524 (Math.cos(10))", (done) => {
+        // 2.1: endedge means the set function has finished, so afterSet comes first.
         const scheduler = new Scheduler(stubs.mathCosNode);
         const seq = [];
         scheduler.addEventListener("begin", () => {
@@ -268,11 +269,10 @@ describe("Scheduler event emitter and scheduler sequence validation", () => {
         scheduler.addEventListener("end", () => {
             seq.push("end");
         });
-        scheduler.url("index", 10);
-        setTimeout(() => {
-            expect(seq.join(",")).toEqual("begin,beginedge,endedge,afterSet,-0.8390715290764524,end");
+        scheduler.url("index", 10).then(() => {
+            expect(seq.join(",")).toEqual("begin,beginedge,afterSet,-0.8390715290764524,endedge,end");
+            done();
         });
-        done();
     });
 });
 describe("Scheduler error states and matching error events", () => {

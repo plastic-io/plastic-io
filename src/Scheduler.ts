@@ -1,8 +1,9 @@
 import Node from "./Node";
 import {execute} from "./Edge";
 import {ConnectorEvent, LoadEvent, Graph, newId, Logger, nullLogger,
-    SchedulerEvent, ExecutionResult, Warning, EdgeError, NodeSetEvent} from "./Shared";
+    SchedulerEvent, ExecutionResult, Warning, EdgeError, NodeSetEvent, SchedulerOptions} from "./Shared";
 import Loader from "./Loader";
+import {Execution, ExecutionHandle, BudgetSpec} from "./Execution";
 /**
  * # Scheduler
  *
@@ -89,10 +90,21 @@ export default class Scheduler {
      */
     warning: (e: Warning) => void;
     /**
-     * Occurs at the end of the initial graph promise chain.  The graph may continue to run as asynchronous functions return.
+     * Occurs when an execution has ended: every promise it started has settled, or its budget ran out, or it was cancelled (2.1).
+     * Carries `executionId`, `state`, `reason`, `hops` and `errors`.
      * @event
      */
     end: (e: SchedulerEvent) => void;
+    /**
+     * Occurs when `host.emit(kind, data)` is called from node code (2.1).
+     * @event
+     */
+    observation: (e: SchedulerEvent) => void;
+    /**
+     * Occurs when an execution is asked to stop, by the caller or by its budget (2.1).
+     * @event
+     */
+    cancel: (e: SchedulerEvent) => void;
     /**
      * Occurs just before set is called.  You can use `setContext` to alter the `this` context object of the node just before the node's set function is invoked.
      * @event
@@ -121,8 +133,18 @@ export default class Scheduler {
     graphLoader: Loader<Graph>;
     /** Loader for loading nodes */
     nodeLoader: Loader<Node>;
-    /** Edge traversal counter */
+    /** Event sequence counter: every dispatched event carries the next value as `seq` (2.1) */
     sequence: number;
+    /** Scheduler-wide settings (2.1) */
+    options: SchedulerOptions;
+    /** Executions that have not ended yet, by id (2.1) */
+    executions: {
+        [key: string]: Execution;
+    };
+    /** Compiled set functions by source text, so a node is compiled once per scheduler (2.1) */
+    compiled: {
+        [key: string]: Function; // tslint:disable-line
+    };
     /** The domain specific context object.  User defined and used by set methods. */
     context: object;
     /** Mutable state object.  This object can be changed and examined later. */
@@ -178,7 +200,7 @@ export default class Scheduler {
      *   ```TypeScript
      *   const scheduler = new Scheduler(myGraphJSON, {}, {}, console);
      */
-    constructor(graph: Graph, context: object = {}, state: object = {}, logger: Logger = nullLogger) {
+    constructor(graph: Graph, context: object = {}, state: object = {}, logger: Logger = nullLogger, options: SchedulerOptions = {}) {
         logger.debug("Scheduler started");
         if (!graph) {
             throw new Error("No graph was passed to the scheduler constructor.");
@@ -196,7 +218,12 @@ export default class Scheduler {
         this.beginconnector = (e: SchedulerEvent): void => { e;return; }; // tslint:disable-line
         this.endconnector = (e: SchedulerEvent): void => { e;return; }; // tslint:disable-line
         this.afterSet = (e: SchedulerEvent): void => { e;return; }; // tslint:disable-line
+        this.observation = (e: SchedulerEvent): void => { e;return; }; // tslint:disable-line
+        this.cancel = (e: SchedulerEvent): void => { e;return; }; // tslint:disable-line
         this.graph = graph;
+        this.options = options || {};
+        this.executions = {};
+        this.compiled = {};
         this.sequence = 0;
         this.context = context;
         this.state = state;
@@ -227,9 +254,13 @@ export default class Scheduler {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(listener);
     }
-    /** Dispatches an event */
+    /** Dispatches an event.  Every event is stamped with the next `seq` (2.1). */
     dispatchEvent(eventName: string, eventData: SchedulerEvent): void {
         this.logger.debug("Scheduler: Dispatch event " + eventName);
+        if (eventData && typeof eventData === "object" && eventData.seq === undefined) {
+            this.sequence += 1;
+            eventData.seq = this.sequence;
+        }
         if (this.events[eventName]) {
             for (const listener of this.events[eventName]) {
                 listener.call(this, eventData);
@@ -279,13 +310,36 @@ export default class Scheduler {
      *   const scheduler = new Scheduler(myGraphJSON);
      *   scheduler.url("my-graph-url", "some value", "some_field", myInnerNodeInstance);
      */
-    async url(url: string, value: any, field: string, currentNode: Node): Promise<ExecutionResult> {
+    async url(url: string, value?: any, field?: string, currentNode?: Node): Promise<ExecutionResult> {
+        return this.invoke(url, value, field, currentNode).done;
+    }
+    /**
+     * Invoke a node's edge and get a handle on the execution (2.1).
+     *
+     * The handle's `done` promise settles when every promise the execution
+     * started has settled, when its budget runs out, or when `cancel()` is
+     * called; `url()` is `invoke(...).done`.
+     *
+     *   ```TypeScript
+     *   const handle = scheduler.invoke("my-graph-url", value, "field", undefined, {budget: {wallMs: 5000, hops: 1000}});
+     *   const result = await handle.done;   // {state: "completed" | "failed" | "cancelled" | "abandoned", hops, errors, ...}
+     *   ```
+     */
+    invoke(url: string, value?: any, field?: string, currentNode?: Node, options: {budget?: BudgetSpec; executionId?: string; revisionId?: string} = {}): ExecutionHandle {
         this.logger.debug("Scheduler: Set URL " + url);
-        const start = Date.now();
+        const execution = new Execution(this, {
+            url,
+            budget: {...(this.options.budget || {}), ...(options.budget || {})},
+            executionId: options.executionId,
+            revisionId: options.revisionId,
+        });
+        this.executions[execution.executionId] = execution;
+        execution.start();
         this.dispatchEvent("begin", {
             url,
-            time: start,
+            time: execution.startedAt,
             id: newId(),
+            executionId: execution.executionId,
         } as SchedulerEvent);
         let graph;
         if (currentNode && currentNode.linkedGraph && currentNode.linkedGraph.graph) {
@@ -304,28 +358,52 @@ export default class Scheduler {
                 time: Date.now(),
                 id: newId(),
                 message: "Cannot find node at the specified URL.",
+                executionId: execution.executionId,
             } as Warning);
         }
         if (node) {
             this.logger.info("Executing node at URL " + url);
-            try {
-                await execute(this, graph, node, field, value);
-            } catch (err) {
+            const span = execution.span();
+            execution.track(execute(this, graph, node, field as string, value, span).catch((err) => {
+                execution.rootFailed = true;
                 this.dispatchEvent("error", {
                     time: Date.now(),
                     id: newId(),
                     err,
+                    executionId: execution.executionId,
+                    spanId: span.spanId,
                 } as EdgeError);
-            }
+            }));
         }
-        this.dispatchEvent("end", {
+        execution.arm();
+        return execution;
+    }
+    /**
+     * Start a new execution for work that begins on its own, such as a node
+     * emitting on an edge long after the execution that created it has ended
+     * (a UI node reacting to a click, a timer).  Used internally.
+     */
+    beginExecution(url: string, parentExecutionId?: string): Execution {
+        const execution = new Execution(this, {url, budget: this.options.budget, parentExecutionId});
+        this.executions[execution.executionId] = execution;
+        execution.start();
+        this.dispatchEvent("begin", {
             url,
-            time: Date.now(),
+            time: execution.startedAt,
             id: newId(),
-            duration: Date.now() - start,
+            executionId: execution.executionId,
+            parentExecutionId,
+            trigger: "edge",
         } as SchedulerEvent);
-        return {
-            nodes: []
-        };
+        return execution;
+    }
+    /** Cancel every execution that has not ended (2.1). */
+    cancelAll(reason: string = "cancelled"): Promise<void> {
+        const pending = Object.keys(this.executions).map((id) => this.executions[id].cancel(reason));
+        return Promise.all(pending).then(() => { return; });
+    }
+    /** An execution has ended.  Used internally. */
+    forget(execution: Execution): void {
+        delete this.executions[execution.executionId];
     }
 }
