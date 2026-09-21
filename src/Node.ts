@@ -3,7 +3,8 @@ import {parseScript} from 'meriyah';
 import {generate} from "escodegen";
 import Scheduler from "./Scheduler";
 import {ConnectorEvent, Graph, newId, EdgeError, NodeTemplate,
-    LinkedNode, LinkedGraph, NodeInterface, NodeSetEvent} from "./Shared";
+    LinkedNode, LinkedGraph, NodeInterface, NodeSetEvent, HostInterface, ObservationEvent, EventIds} from "./Shared";
+import {Span, Execution, ExecutionCancelled} from "./Execution";
 /**
  *
  * Nodes are the building blocks of the graph.
@@ -59,21 +60,104 @@ export default interface Node {
      */
     __contextId: any;
 }
+const SET_PARAMETERS = ["scheduler", "graph", "cache", "node", "field",
+    "state", "value", "edges", "data", "properties", "require", "host"];
+
+/**
+ * The native AsyncFunction constructor.
+ *
+ * Asked for at runtime through `Function`, because this package compiles to
+ * ES5 and TypeScript rewrites `async function(){}` into a generator helper
+ * whose constructor is the plain `Function`: node code containing `await`
+ * was a syntax error in 2.0 for that reason alone.
+ */
+function asyncFunctionConstructor(): any {
+    try {
+        return new Function("return Object.getPrototypeOf(async function(){}).constructor")(); // tslint:disable-line
+    } catch (err) {
+        return Function;
+    }
+}
+const AsyncFunction = asyncFunctionConstructor();
+
+/**
+ * Compile a set function once per source text.
+ *
+ * `direct` hands the source to `AsyncFunction` as written: the body of an
+ * async function already allows top-level `await` and `return`, so nothing
+ * needs regenerating and every syntax the runtime knows is available.  When
+ * the source does not parse, meriyah is consulted only for a located message.
+ * `meriyah` keeps the 2.0 parse-then-regenerate path for embedders that
+ * depend on it.
+ */
+export function compile(scheduler: Scheduler, code: string): Function { // tslint:disable-line
+    const mode = scheduler.options.compile || "direct";
+    const key = mode + ":" + code;
+    if (scheduler.compiled[key]) {
+        return scheduler.compiled[key];
+    }
+    let fn;
+    if (mode === "meriyah") {
+        const ast = parseScript(code, {loc: true, module: true, next: true, globalReturn: true});
+        fn = new AsyncFunction(...SET_PARAMETERS, generate(ast));
+    } else {
+        try {
+            fn = new AsyncFunction(...SET_PARAMETERS, code);
+        } catch (err) {
+            // a parse error with a location beats "Unexpected token"
+            parseScript(code, {loc: true, module: true, next: true, globalReturn: true});
+            throw err;
+        }
+    }
+    scheduler.compiled[key] = fn;
+    return fn;
+}
+
+/** The `host` binding for one invocation: identity, cancellation, observations, plus whatever the embedder adds. */
+function buildHost(scheduler: Scheduler, execution: Execution | undefined, nodeInterface: NodeInterface): HostInterface {
+    const base: HostInterface = {
+        executionId: execution ? execution.executionId : "",
+        get cancelled(): boolean {
+            return execution ? execution.token.cancelled : false;
+        },
+        signal: execution ? execution.token.signal : undefined,
+        throwIfCancelled(): void {
+            if (execution) {
+                execution.token.throwIfCancelled();
+            }
+        },
+        emit(kind: string, data?: any): void {
+            if (execution && !execution.observe()) {
+                return;
+            }
+            scheduler.dispatchEvent("observation", {
+                id: newId(),
+                time: Date.now(),
+                kind,
+                data,
+                nodeId: nodeInterface.node.id,
+                graphId: nodeInterface.graph.id,
+                executionId: execution ? execution.executionId : undefined,
+            } as ObservationEvent);
+        },
+        now(): number {
+            return Date.now();
+        },
+        random(): number {
+            return Math.random();
+        },
+    };
+    const extra = typeof scheduler.options.host === "function"
+        ? scheduler.options.host({execution, nodeInterface})
+        : scheduler.options.host;
+    return extra ? Object.assign(base, extra) : base;
+}
+
 /** Utility to parse and run nodes.  Used internally to run the node's set function. */
-function parseAndRun(code: string, nodeInterface: NodeInterface): Promise<any> {
+function parseAndRun(code: string, nodeInterface: NodeInterface, execution?: Execution): Promise<any> {
     return new Promise(async (resolve, reject) => {
         try {
-            const ast = parseScript(code, {
-                loc: true,
-                module: true,
-                next: true,
-                globalReturn: true,
-            });
-
-            // tslint:disable-next-line
-            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor; // eslint-disable-line 
-            const nodeFn = new AsyncFunction("scheduler", "graph", "cache", "node", "field",
-                "state", "value", "edges", "data", "properties", "require", generate(ast));
+            const nodeFn = compile(nodeInterface.scheduler, code);
             nodeInterface.scheduler.dispatchEvent("set", {
                 id: newId(),
                 nodeId: nodeInterface.node.id,
@@ -81,6 +165,7 @@ function parseAndRun(code: string, nodeInterface: NodeInterface): Promise<any> {
                 field: nodeInterface.field,
                 time: Date.now(),
                 nodeInterface,
+                executionId: execution ? execution.executionId : undefined,
                 setContext(val: any) {
                     nodeInterface.scheduler.logger.debug(`Node: setContext setting context of node.`);
                     nodeInterface.context = val;
@@ -102,6 +187,7 @@ function parseAndRun(code: string, nodeInterface: NodeInterface): Promise<any> {
                 (path: any) => {
                     return eval("require")(path); // tslint:disable-line
                 },
+                nodeInterface.host,
             ))
             .then(result => {
                 nodeInterface.scheduler.logger.debug(`Node: just executed compiled function without error.`);
@@ -183,10 +269,36 @@ export function linkInnerNodeEdges(vect: Node, scheduler: Scheduler): void {
         });
     });
 }
+/** Runs a contract hook; reports a violation and says whether the delivery may go on. */
+function contract(scheduler: Scheduler, hook: "onInput" | "onOutput", info: any, ids: EventIds): boolean {
+    const fn = scheduler.options[hook];
+    if (!fn) {
+        return true;
+    }
+    try {
+        fn(info);
+        return true;
+    } catch (err) {
+        const reject = scheduler.options.contractMode === "reject";
+        scheduler.dispatchEvent(reject ? "error" : "warning", {
+            id: newId(),
+            time: Date.now(),
+            err,
+            message: "Contract violation (" + hook + "): " + err,
+            code: "CONTRACT_VIOLATION",
+            nodeId: info.node.id,
+            field: info.field,
+            ...ids,
+        } as EdgeError);
+        return !reject;
+    }
+}
 /** Run connector code in isolation, creates interface.  Used internally. */
-export async function execute(scheduler: Scheduler, graph: Graph, node: Node, field: string, value: any): Promise<any> {
+export async function execute(scheduler: Scheduler, graph: Graph, node: Node, field: string, value: any, span?: Span): Promise<any> {
     const log = scheduler.logger;
     log.debug(`Node: Begin execute node.id ${node.id}, field ${field}`);
+    const execution = span ? span.execution : undefined;
+    const ids: EventIds = span ? {executionId: span.execution.executionId, spanId: span.spanId, parentSpanId: span.parentSpanId} : {};
     let vect = node;
     if (node.linkedNode && !node.linkedNode.loaded) {
         log.debug(`Node: Load linkedNode.id ${node.linkedNode.id} for node.id: ${node.id}`);
@@ -240,17 +352,46 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
     log.debug(`Node: node.edge.length ${vect.edges.length}`);
     vect.edges.forEach((edge: Edge) => {
         Object.defineProperty(edges, edge.field, {
-            set: async (setterVal: any) => {
+            set: (setterVal: any) => {
+                // An emission after the execution has ended (a UI node reacting
+                // to a click, a timer) starts an execution of its own, so it is
+                // tracked, budgeted and attributed like any other.
+                let current: Execution | undefined = execution;
+                let parentSpan: Span | undefined = span;
+                if (current && current.isSettled) {
+                    current = scheduler.beginExecution(vect.url, current.executionId);
+                    parentSpan = current.span();
+                }
+                const setterIds: EventIds = current ? {executionId: current.executionId, spanId: parentSpan ? parentSpan.spanId : undefined} : {};
                 async function setter(val: any): Promise<void> {
                     log.debug(`Node: Edge setter invoked. field ${edge.field}, edge.connectors.length ${edge.connectors.length}, node.id ${vect.id}, graph.id, ${graph.id}`);
-                    for (const connector of edge.connectors) {
-                        if (connector.graphId !== graph.id) {
-                            graph = await scheduler.graphLoader.load(scheduler.getGraphPath(connector.graphId, connector.version));
+                    if (current) {
+                        current.token.throwIfCancelled();
+                        if (!current.fanOut(edge.connectors.length)) {
+                            return;
                         }
-                        const nodeNext = graph.nodes.find((v: Node) => {
+                    }
+                    if (!contract(scheduler, "onOutput", {node: vect, field: edge.field, value: val, executionId: current ? current.executionId : ""}, setterIds)) {
+                        return;
+                    }
+                    for (const connector of edge.connectors) {
+                        if (current && current.token.cancelled) {
+                            break;
+                        }
+                        // The connector may point into another graph; that graph is
+                        // loaded for this connector only and never replaces `graph`
+                        // for the node's remaining connectors (2.0 reassigned it).
+                        let targetGraph: Graph = graph;
+                        if (connector.graphId !== graph.id) {
+                            targetGraph = await scheduler.graphLoader.load(scheduler.getGraphPath(connector.graphId, connector.version));
+                        }
+                        const nodeNext = targetGraph.nodes.find((v: Node) => {
                             return connector.nodeId === v.id;
                         });
                         if (nodeNext) {
+                            if (!contract(scheduler, "onInput", {node: nodeNext, field: connector.field, value: val, connector, executionId: current ? current.executionId : ""}, setterIds)) {
+                                continue;
+                            }
                             log.debug(`Node: Edge.execute nodeNext.id ${nodeNext.id} nodeNext.graphId ${nodeNext.graphId}`);
                             const start = Date.now();
                             scheduler.dispatchEvent("beginconnector", {
@@ -258,8 +399,10 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                                 id: newId(),
                                 connector,
                                 value: val,
+                                ...setterIds,
                             } as ConnectorEvent);
-                            edgeExecute(scheduler, graph, nodeNext, connector.field, val).then(() => {
+                            const childSpan = current ? current.span(parentSpan) : undefined;
+                            const delivery = edgeExecute(scheduler, targetGraph, nodeNext, connector.field, val, childSpan).then(() => {
                                 const end = Date.now();
                                 scheduler.dispatchEvent("endconnector", {
                                     time: end,
@@ -267,8 +410,12 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                                     id: newId(),
                                     connector,
                                     value: val,
+                                    ...setterIds,
                                 } as ConnectorEvent);
                             }).catch((err) => {
+                                if (err instanceof ExecutionCancelled) {
+                                    return;
+                                }
                                 log.error(err.stack);
                                 scheduler.dispatchEvent("error", {
                                     id: newId(),
@@ -279,11 +426,18 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                                     connectorId: connector.id,
                                     nodeId: vect.id,
                                     graphId: graph.id,
+                                    ...setterIds,
                                 } as EdgeError);
                             });
+                            if (current) {
+                                current.track(delivery);
+                            }
                         } else {
                             const err = new Error(`Connector refers to a node edge that does not exist.  Connector.id: ${connector.id}`);
                             log.error(err.stack);
+                            if (current) {
+                                current.errors += 1;
+                            }
                             scheduler.dispatchEvent("error", {
                                 id: newId(),
                                 time: Date.now(),
@@ -293,13 +447,20 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                                 connectorId: connector.id,
                                 nodeId: vect.id,
                                 graphId: graph.id,
+                                ...setterIds,
                             } as EdgeError);
                         }
                     }
                 }
-                setter(setterVal).then(() => {
+                const run = setter(setterVal).then(() => {
                     log.debug('Async setter completed successfully.');
                 }).catch((err) => {
+                    if (err instanceof ExecutionCancelled) {
+                        return;
+                    }
+                    if (current) {
+                        current.errors += 1;
+                    }
                     const er = new Error(`Node: Edge setter error. field ${edge.field}, node.id ${vect.id}. Error: ${err}`);
                     log.error(er.stack);
                     scheduler.dispatchEvent("error", {
@@ -310,8 +471,15 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                         edgeField: edge.field,
                         nodeId: vect.id,
                         graphId: graph.id,
+                        ...setterIds,
                     } as EdgeError);
                 });
+                if (current) {
+                    current.track(run);
+                    if (current !== execution) {
+                        current.arm();
+                    }
+                }
             }
         });
     });
@@ -329,19 +497,42 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
         graph,
         data: vect.data,
         properties: vect.properties,
+        executionId: execution ? execution.executionId : undefined,
     } as NodeInterface;
+    nodeInterface.host = buildHost(scheduler, execution, nodeInterface);
     if (vect.template.set) {
         log.debug(`Node: Parse and run template for node.id: ${node.id} template length ${vect.template.set.length}`);
-        parseAndRun(vect.template.set, nodeInterface).then((setResult: any) => {
+        // Awaited, so `endedge` means the set function has finished (2.0.3 let
+        // it run past the edge); deliveries it started are tracked on their own.
+        const run = parseAndRun(vect.template.set, nodeInterface, execution).then((setResult: any) => {
             scheduler.dispatchEvent("afterSet", {
                 id: newId(),
                 return: setResult,
                 time: Date.now(),
                 nodeInterface,
+                nodeId: vect.id,
+                graphId: graph.id,
+                field,
+                ...ids,
             } as NodeSetEvent);
         }).catch((err) => {
-            const er = err;
+            if (err instanceof ExecutionCancelled) {
+                return;
+            }
+            if (execution) {
+                execution.errors += 1;
+            }
             scheduler.logger.error(`Node: set function caused an error: ${err.stack}`);
+            scheduler.dispatchEvent("afterSet", {
+                id: newId(),
+                err,
+                time: Date.now(),
+                nodeInterface,
+                nodeId: vect.id,
+                graphId: graph.id,
+                field,
+                ...ids,
+            } as NodeSetEvent);
             scheduler.dispatchEvent("error", {
                 id: newId(),
                 time: Date.now(),
@@ -350,11 +541,19 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                 nodeId: vect.id,
                 graphId: graph.id,
                 field,
+                ...ids,
             } as EdgeError);
         });
+        if (execution) {
+            execution.track(run);
+        }
+        await run;
     } else if (!vect.linkedGraph) {
         const err = new Error(`Node: No template for set found on node.id ${node.id}`);
         scheduler.logger.error(err.stack);
+        if (execution) {
+            execution.errors += 1;
+        }
         scheduler.dispatchEvent("error", {
             id: newId(),
             time: Date.now(),
@@ -363,6 +562,7 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
             nodeId: vect.id,
             graphId: graph.id,
             field,
+            ...ids,
         } as EdgeError);
     }
 }

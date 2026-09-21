@@ -1,4 +1,4 @@
-// Type definitions for plastic-io 1.0.0
+// Type definitions for plastic-io 2.1.0
 // Project: plastic-io
 // Definitions by: Tony Germaneri https://github.com/plastic-io
 import {
@@ -19,15 +19,32 @@ import {
     SchedulerEvent,
     EdgeError,
     Warning,
+    HostInterface,
+    ObservationEvent,
+    SchedulerOptions,
+    ContractHook,
+    EventIds,
 } from "./Shared";
 import Scheduler from "./Scheduler";
 import Edge from "./Edge";
-import Node, {linkInnerNodeEdges, getLinkedInputs} from "./Node";
+import Node, {linkInnerNodeEdges, getLinkedInputs, compile} from "./Node";
 import Loader from "./Loader";
+import {
+    Execution,
+    ExecutionCancelled,
+    CancellationToken,
+    DEFAULT_BUDGET,
+    ExecutionHandle,
+    BudgetSpec,
+    BudgetView,
+    ExecutionState,
+    Span,
+} from "./Execution";
 export default Scheduler;
 export {
     getLinkedInputs,
     linkInnerNodeEdges,
+    compile,
     Loader,
     Node,
     Edge,
@@ -48,4 +65,18 @@ export {
     ConnectorEvent,
     EdgeError,
     Warning,
+    Execution,
+    ExecutionCancelled,
+    CancellationToken,
+    DEFAULT_BUDGET,
+    ExecutionHandle,
+    BudgetSpec,
+    BudgetView,
+    ExecutionState,
+    Span,
+    HostInterface,
+    ObservationEvent,
+    SchedulerOptions,
+    ContractHook,
+    EventIds,
 }
