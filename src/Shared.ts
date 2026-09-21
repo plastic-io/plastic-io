@@ -319,7 +319,28 @@ export interface SchedulerOptions {
     onOutput?: ContractHook;
     /** What a contract violation does: `warn` (default) reports and continues, `reject` reports and drops the delivery. */
     contractMode?: "warn" | "reject";
+    /**
+     * Run a node's code somewhere other than this realm.
+     *
+     * The scheduler still decides what runs, in what order, with which value;
+     * this decides *where* the code itself runs.  A runtime that contains node
+     * code in a V8 isolate, a worker or another process supplies this, reads
+     * what the node needs from `nodeInterface`, and writes results back
+     * through the same object (`edges`, `state`, `data`).  Calling
+     * `runInProcess()` falls back to the ordinary in-realm path, so a runtime
+     * can contain some nodes and not others.
+     */
+    executeNode?: NodeExecutor;
 }
+/** See `SchedulerOptions.executeNode`. */
+export type NodeExecutor = (info: {
+    /** The node's source, as the scheduler would have compiled it. */
+    code: string;
+    nodeInterface: NodeInterface;
+    execution?: any;
+    /** Run the node here instead, with the ordinary parameter list. */
+    runInProcess: () => Promise<any>;
+}) => Promise<any> | any;
 /** An error that occurred while traversing an edge.  Most runtime and user errors occur here */
 export interface EdgeError extends SchedulerEvent {
     /** Standard error */

@@ -156,23 +156,16 @@ function buildHost(scheduler: Scheduler, execution: Execution | undefined, nodeI
 /** Utility to parse and run nodes.  Used internally to run the node's set function. */
 function parseAndRun(code: string, nodeInterface: NodeInterface, execution?: Execution): Promise<any> {
     return new Promise(async (resolve, reject) => {
-        try {
+        /**
+         * Run the node here, in this realm, with the 2.0 parameter list.  A
+         * runtime that contains node code elsewhere (a V8 isolate, a worker,
+         * another machine) supplies `options.executeNode` and calls this only
+         * for the nodes it chooses to keep in process.
+         */
+        const runInProcess = () => {
             const nodeFn = compile(nodeInterface.scheduler, code);
-            nodeInterface.scheduler.dispatchEvent("set", {
-                id: newId(),
-                nodeId: nodeInterface.node.id,
-                graphId: nodeInterface.node.graphId,
-                field: nodeInterface.field,
-                time: Date.now(),
-                nodeInterface,
-                executionId: execution ? execution.executionId : undefined,
-                setContext(val: any) {
-                    nodeInterface.scheduler.logger.debug(`Node: setContext setting context of node.`);
-                    nodeInterface.context = val;
-                },
-            } as NodeSetEvent);
             nodeInterface.scheduler.logger.debug(`Node: about to execute compiled function.`);
-            Promise.resolve(nodeFn.call(
+            return Promise.resolve(nodeFn.call(
                 nodeInterface.context,
                 nodeInterface.scheduler,
                 nodeInterface.graph,
@@ -188,15 +181,35 @@ function parseAndRun(code: string, nodeInterface: NodeInterface, execution?: Exe
                     return eval("require")(path); // tslint:disable-line
                 },
                 nodeInterface.host,
-            ))
-            .then(result => {
-                nodeInterface.scheduler.logger.debug(`Node: just executed compiled function without error.`);
-                resolve(result);
-            })
-            .catch(error => {
-                nodeInterface.scheduler.logger.debug(`Node: just executed compiled function with error ${error}.`);
-                reject(error);
-            });
+            ));
+        };
+        try {
+            nodeInterface.scheduler.dispatchEvent("set", {
+                id: newId(),
+                nodeId: nodeInterface.node.id,
+                graphId: nodeInterface.node.graphId,
+                field: nodeInterface.field,
+                time: Date.now(),
+                nodeInterface,
+                executionId: execution ? execution.executionId : undefined,
+                setContext(val: any) {
+                    nodeInterface.scheduler.logger.debug(`Node: setContext setting context of node.`);
+                    nodeInterface.context = val;
+                },
+            } as NodeSetEvent);
+            const executor = nodeInterface.scheduler.options.executeNode;
+            const run = executor
+                ? Promise.resolve(executor({code, nodeInterface, execution, runInProcess}))
+                : runInProcess();
+            run
+                .then(result => {
+                    nodeInterface.scheduler.logger.debug(`Node: just executed compiled function without error.`);
+                    resolve(result);
+                })
+                .catch(error => {
+                    nodeInterface.scheduler.logger.debug(`Node: just executed compiled function with error ${error}.`);
+                    reject(error);
+                });
         } catch (error) {
             nodeInterface.scheduler.logger.debug(`Node: caught an error while script parsing: ${error}.`);
             reject(error);

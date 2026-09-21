@@ -233,3 +233,43 @@ describe("execution handles and completion (2.1)", () => {
         expect(new ExecutionCancelled("x").name).toBe("ExecutionCancelled");
     });
 });
+
+describe("running node code somewhere else (options.executeNode)", () => {
+    it("hands every node to the executor, which may run it elsewhere or in process", async () => {
+        const seen = [];
+        const g = graph({
+            a: {set: "edges.out = value + 1;", to: [["out", "b"]]},
+            b: {set: "state.result = value * 10;"},
+        });
+        const state = {};
+        const scheduler = new Scheduler(g, {}, state, undefined, {
+            executeNode: ({code, nodeInterface, execution, runInProcess}) => {
+                seen.push([nodeInterface.node.id, nodeInterface.field, nodeInterface.value, typeof code, execution.executionId.length]);
+                if (nodeInterface.node.id === "b") {
+                    // a contained runtime writes results back through the same interface
+                    nodeInterface.state.result = nodeInterface.value * 100;
+                    return Promise.resolve();
+                }
+                return runInProcess();
+            },
+        });
+        await scheduler.invoke("a", 1, "in").done;
+        expect(seen).toEqual([
+            ["a", "in", 1, "string", 36],
+            ["b", "in", 2, "string", 36],
+        ]);
+        expect(state.result).toBe(200);
+    });
+
+    it("an error from the executor is the node's error, and the set event still fires", async () => {
+        const g = graph({a: {set: "edges.out = 1;"}});
+        const scheduler = new Scheduler(g, {}, {}, undefined, {
+            executeNode: () => Promise.reject(new Error("contained runtime refused")),
+        });
+        const events = record(scheduler, ["set", "error"]);
+        const result = await scheduler.invoke("a", 1, "in").done;
+        expect(result.errors).toBe(1);
+        expect(events.map(([name]) => name)).toEqual(["set", "error"]);
+        expect(String(events[1][1].err)).toMatch(/contained runtime refused/);
+    });
+});
