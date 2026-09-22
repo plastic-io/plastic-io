@@ -30,6 +30,13 @@ import Edge from "./Edge";
 import Node, {linkInnerNodeEdges, getLinkedInputs, compile} from "./Node";
 import Loader from "./Loader";
 import {
+    GraphInstance,
+    LinkedGraphDepthError,
+    DEFAULT_LINKED_GRAPH_DEPTH,
+    instanceOf,
+    instancePathOf,
+} from "./Instances";
+import {
     Execution,
     ExecutionCancelled,
     CancellationToken,
@@ -79,4 +86,11 @@ export {
     SchedulerOptions,
     ContractHook,
     EventIds,
+    // Linked graphs as calls (2.3): one instance per use, named by the path
+    // of hosts it was reached through.
+    GraphInstance,
+    LinkedGraphDepthError,
+    DEFAULT_LINKED_GRAPH_DEPTH,
+    instanceOf,
+    instancePathOf,
 }
