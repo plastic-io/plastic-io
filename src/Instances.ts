@@ -209,6 +209,31 @@ function wireOutputs(graph: Graph, host: Node, linked: LinkedGraph): void {
 }
 
 /**
+ * The graph of the call named by this path, made if it has not been made yet.
+ *
+ * A path is the chain of host node ids a call was reached through, which is
+ * what an instance is named by — so this is how something *outside* an
+ * execution enters one: a hop handed to the other domain says which call it
+ * belongs to, and the domain that answers it has to stand in the same call
+ * rather than in a graph that merely looks like it.
+ */
+export async function instanceAt(scheduler: Scheduler, path: string[]): Promise<Graph> {
+    let graph: Graph = scheduler.graph;
+    for (const hostId of path || []) {
+        const host = (graph.nodes || []).find((node: Node) => node.id === hostId);
+        if (!host) {
+            throw new Error(`No node ${hostId} in ${graph.id}: the call ${(path || []).join("/")} cannot be entered`);
+        }
+        if (!host.linkedGraph) {
+            throw new Error(`Node ${hostId} carries no graph: the call ${(path || []).join("/")} cannot be entered`);
+        }
+        const instance = await instanceFor(scheduler, host, graph);
+        graph = instance.graph;
+    }
+    return graph;
+}
+
+/**
  * The graph a connector points into.  A connector inside an instance that
  * names another graph is nearly always on its way back out to the one that
  * called it, and that graph is in memory — asking the loader for it would find

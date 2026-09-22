@@ -35,6 +35,7 @@ import {
     DEFAULT_LINKED_GRAPH_DEPTH,
     instanceOf,
     instancePathOf,
+    instanceAt,
 } from "./Instances";
 import {
     Execution,
@@ -93,4 +94,5 @@ export {
     DEFAULT_LINKED_GRAPH_DEPTH,
     instanceOf,
     instancePathOf,
+    instanceAt,
 }

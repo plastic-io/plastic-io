@@ -4,7 +4,7 @@ import {ConnectorEvent, LoadEvent, Graph, newId, Logger, nullLogger,
     SchedulerEvent, ExecutionResult, Warning, EdgeError, NodeSetEvent, SchedulerOptions} from "./Shared";
 import Loader from "./Loader";
 import type {GraphInstance} from "./Instances";
-import {pristine} from "./Instances";
+import {pristine, instanceAt} from "./Instances";
 import {Execution, ExecutionHandle, BudgetSpec} from "./Execution";
 /**
  * # Scheduler
@@ -361,6 +361,27 @@ export default class Scheduler {
      *   ```
      */
     invoke(url: string, value?: any, field?: string, currentNode?: Node, options: {budget?: BudgetSpec; executionId?: string; revisionId?: string} = {}): ExecutionHandle {
+        const graph = currentNode && currentNode.linkedGraph && currentNode.linkedGraph.graph
+            ? currentNode.linkedGraph.graph
+            : this.graph;
+        return this.invokeOn(graph, url, value, field, options);
+    }
+    /**
+     * Invoke a node **inside a call**: `instancePath` is the chain of host node
+     * ids the call was reached through, which is what an instance is named by.
+     *
+     * This is how a hop that crossed a domain boundary comes back to the call
+     * it belongs to.  Without it the other domain could only run a node that
+     * exists in the flat document, which is why an imported graph had to be
+     * flattened before anything could be handed across (D-38).  Entering a call
+     * that has already been made returns to it, with the state it has.
+     */
+    async invokeIn(instancePath: string[], url: string, value?: any, field?: string, options: {budget?: BudgetSpec; executionId?: string; revisionId?: string} = {}): Promise<ExecutionHandle> {
+        const graph = await instanceAt(this, instancePath || []);
+        return this.invokeOn(graph, url, value, field, options);
+    }
+    /** What `invoke` and `invokeIn` share: everything but which graph it is in. */
+    private invokeOn(graph: Graph, url: string, value?: any, field?: string, options: {budget?: BudgetSpec; executionId?: string; revisionId?: string} = {}): ExecutionHandle {
         this.logger.debug("Scheduler: Set URL " + url);
         const execution = new Execution(this, {
             url,
@@ -376,16 +397,12 @@ export default class Scheduler {
             id: newId(),
             executionId: execution.executionId,
         } as SchedulerEvent);
-        let graph;
-        if (currentNode && currentNode.linkedGraph && currentNode.linkedGraph.graph) {
-            graph = currentNode.linkedGraph.graph;
-        } else {
-            graph = this.graph;
-        }
+        // A node is addressed by its url, as it always has been — or by its id,
+        // which is how a hop from the other domain names it, because inside a
+        // call the url is the component author's and the id is what crossed.
         const pattern = new RegExp(url);
-        const node = graph.nodes.find((vec: Node) => {
-            return pattern.test(vec.url);
-        }) as Node;
+        const node = (graph.nodes.find((vec: Node) => vec.id === url)
+            || graph.nodes.find((vec: Node) => pattern.test(vec.url))) as Node;
         if (!node && url) {
             this.logger.warn("Scheduler: Cannot find URL " + url);
             this.dispatchEvent("warning", {

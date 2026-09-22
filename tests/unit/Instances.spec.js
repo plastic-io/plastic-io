@@ -300,3 +300,60 @@ describe("a resolver that has to go and get it", () => {
         expect(state.ran).toBe(1);
     });
 });
+
+describe("entering a call from outside it", () => {
+    /**
+     * A hop that crossed a domain boundary has to come back to the call it
+     * belongs to — not to a graph that merely looks like it.  `invokeIn` takes
+     * the path the instance is named by, which is exactly what a delivery
+     * carries, and runs the node there.
+     */
+    const twoUses = () => {
+        const inner = graph("inner", [
+            node("front", "edges.on = value;", {url: "front", graphId: "inner", edges: [edge("on", [to("back", "in", "inner")])]}),
+            node("back", `
+                instance && (instance.state.seen = (instance.state.seen || 0) + 1);
+                state.log = state.log || [];
+                state.log.push({who: instance ? instance.path.join("/") : null, n: value && value.n, seen: instance ? instance.state.seen : null});
+            `, {url: "back", graphId: "inner", edges: []}),
+        ]);
+        const g = graph("root", [
+            node("entry", "edges.left = value;", {edges: [edge("left", [to("first", "in")])]}),
+            node("first", "", {edges: []}),
+            node("second", "", {edges: []}),
+        ]);
+        [1, 2].forEach((i) => {
+            g.nodes[i].linkedGraph = {
+                id: "inner", version: 0, loaded: false, graph: inner, properties: {}, data: {},
+                fields: {inputs: {in: {id: "front", field: "in"}}, outputs: {}},
+            };
+        });
+        return g;
+    };
+
+    it("runs the node in the call the path names, and in no other", async () => {
+        const state = {};
+        const scheduler = new Scheduler(twoUses(), {}, state);
+        const handle = await scheduler.invokeIn(["second"], "back", {n: 7}, "in");
+        await handle.done;
+        await settle();
+        expect(state.log).toEqual([{who: "second", n: 7, seen: 1}]);
+    });
+
+    it("comes back to a call that has already run, with the state it has", async () => {
+        const state = {};
+        const scheduler = new Scheduler(twoUses(), {}, state);
+        await scheduler.url("entry", {n: 1});
+        await settle();
+        const handle = await scheduler.invokeIn(["first"], "back", {n: 2}, "in");
+        await handle.done;
+        await settle();
+        expect(state.log.map((l) => [l.who, l.n, l.seen])).toEqual([["first", 1, 1], ["first", 2, 2]]);
+    });
+
+    it("says which call it could not enter", async () => {
+        const scheduler = new Scheduler(twoUses(), {}, {});
+        await expect(scheduler.invokeIn(["nowhere"], "back", {}, "in")).rejects.toThrow(/No node nowhere in root/);
+        await expect(scheduler.invokeIn(["entry"], "back", {}, "in")).rejects.toThrow(/carries no graph/);
+    });
+});
