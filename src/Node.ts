@@ -2,6 +2,7 @@ import Edge, {execute as edgeExecute} from "./Edge";
 import {parseScript} from 'meriyah';
 import {generate} from "escodegen";
 import Scheduler from "./Scheduler";
+import {GraphInstance, instanceFor, graphForConnector} from "./Instances";
 import {ConnectorEvent, Graph, newId, EdgeError, NodeTemplate,
     LinkedNode, LinkedGraph, NodeInterface, NodeSetEvent, HostInterface, ObservationEvent, EventIds} from "./Shared";
 import {Span, Execution, ExecutionCancelled} from "./Execution";
@@ -61,7 +62,7 @@ export default interface Node {
     __contextId: any;
 }
 const SET_PARAMETERS = ["scheduler", "graph", "cache", "node", "field",
-    "state", "value", "edges", "data", "properties", "require", "host"];
+    "state", "value", "edges", "data", "properties", "require", "host", "instance"];
 
 /**
  * The native AsyncFunction constructor.
@@ -181,6 +182,7 @@ function parseAndRun(code: string, nodeInterface: NodeInterface, execution?: Exe
                     return eval("require")(path); // tslint:disable-line
                 },
                 nodeInterface.host,
+                nodeInterface.instance,
             ));
         };
         try {
@@ -217,9 +219,11 @@ function parseAndRun(code: string, nodeInterface: NodeInterface, execution?: Exe
     });
 }
 /** Utility to connect linked nodes and the host graph's node.  Used internally. */
-export function getLinkedInputs(vect: Node, field: string, scheduler: Scheduler): any {
+export function getLinkedInputs(vect: Node, field: string, scheduler: Scheduler, within?: Graph): any {
     const log = scheduler.logger;
-    const graph = vect.linkedGraph!.graph;// eslint-disable-line
+    // `within` is the instance this call belongs to; without one this is the
+    // 2.2 behaviour, which reached into the document every use shared.
+    const graph = within || vect.linkedGraph!.graph;// eslint-disable-line
     const outputs = vect.linkedGraph!.fields.outputs;// eslint-disable-line
     const inputs = vect.linkedGraph!.fields.inputs;// eslint-disable-line
     // ----- INPUTS
@@ -335,30 +339,24 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
             vect.properties = node.properties;
         }
     }
+    /**
+     * A linked graph is a call (2.3).  The instance this value belongs to is
+     * named by the host nodes it was reached through, so the same use keeps
+     * its nodes between calls, two uses share nothing, and a graph reached
+     * through itself is a deeper path — a new instance, with its own data.
+     * Recursion is that, and nothing more; a graph that does not stop itself
+     * meets the depth ceiling and fails saying which path it took.
+     */
+    let instance: GraphInstance | undefined;
     if (vect.linkedGraph) {
-        if (!vect.linkedGraph.loaded) {
-            log.debug(`Node: Load linked graph for node.id ${node.id}`);
-            vect.linkedGraph.graph = await scheduler.graphLoader.load(scheduler.getGraphPath(vect.linkedGraph.id, vect.linkedGraph.version));
-            linkInnerNodeEdges(vect, scheduler);
-            vect.linkedGraph.loaded = true;
-        }
-        if (node.linkedGraph && !node.linkedGraph.graph) {
-            const err = new Error(`Node: Critical Error: Linked graph not found on node.id: ${node.id}`);
-            log.error(err.stack);
-            scheduler.dispatchEvent("error", {
-                id: newId(),
-                time: Date.now(),
-                err,
-                message: err.toString(),
-                nodeId: node.id,
-                graphId: graph.id,
-            } as EdgeError);
-        } else {
-            graph = vect.linkedGraph!.graph;// eslint-disable-line
-            const proxyInput = getLinkedInputs(vect, field, scheduler);
-            field = proxyInput.field;
-            vect = proxyInput.node;
-        }
+        // A graph that cannot be instantiated — it will not load, or the
+        // recursion has gone past the ceiling — throws from here and is
+        // reported by the edge, the way every other failure in a node is.
+        instance = await instanceFor(scheduler, vect, graph);
+        graph = instance.graph;
+        const proxyInput = getLinkedInputs(vect, field, scheduler, instance.graph);
+        field = proxyInput.field;
+        vect = proxyInput.node;
     }
     const edges = {};
     // create outputs for interface
@@ -394,9 +392,14 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
                         // The connector may point into another graph; that graph is
                         // loaded for this connector only and never replaces `graph`
                         // for the node's remaining connectors (2.0 reassigned it).
+                        // The connector may point into another graph — back out
+                        // to the instance that called this one, or to a document
+                        // the loader has.  The same-graph case stays synchronous:
+                        // an await here, even on a value, would defer delivery a
+                        // microtask and a 2.0 graph would stop working.
                         let targetGraph: Graph = graph;
                         if (connector.graphId !== graph.id) {
-                            targetGraph = await scheduler.graphLoader.load(scheduler.getGraphPath(connector.graphId, connector.version));
+                            targetGraph = await graphForConnector(scheduler, graph, connector);
                         }
                         const nodeNext = targetGraph.nodes.find((v: Node) => {
                             return connector.nodeId === v.id;
@@ -496,17 +499,20 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
             }
         });
     });
-    // ensure the node has a cache for private use
-    scheduler.nodeCache[vect.id] = scheduler.nodeCache[vect.id] || {};
+    // ensure the node has a cache for private use; inside an instance the
+    // cache belongs to that instance, as its data does
+    const cacheKey = instance ? `${instance.path.join("/")}/${vect.id}` : vect.id;
+    scheduler.nodeCache[cacheKey] = scheduler.nodeCache[cacheKey] || {};
     // provide interface for invoking code
     const nodeInterface = {
         scheduler,
         edges,
         state: scheduler.state,
+        instance: instance ? {path: instance.path, depth: instance.depth, state: instance.state} : undefined,
         field,
         value,
         node: vect,
-        cache: scheduler.nodeCache[vect.id],
+        cache: scheduler.nodeCache[cacheKey],
         graph,
         data: vect.data,
         properties: vect.properties,

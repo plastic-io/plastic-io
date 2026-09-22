@@ -105,6 +105,19 @@ export interface LinkedGraph {
 export interface NodeInterface {
     /** The scheduler */
     scheduler: Scheduler;
+    /**
+     * Which use of a linked graph this node is running in (2.3), and scratch
+     * belonging to that use alone.  Absent in the graph the scheduler was
+     * given, present in every instance of a linked one: `path` names the host
+     * nodes it was reached through, `depth` is how many deep it is, and
+     * `state` is this instance's own — two uses of one subgraph, or two turns
+     * of a recursion, never see each other's.
+     */
+    instance?: {
+        path: string[];
+        depth: number;
+        state: {[key: string]: any};
+    };
     /** The node being set */
     node: Node;
     /** The name of the edge being set */
@@ -331,6 +344,13 @@ export interface SchedulerOptions {
      * can contain some nodes and not others.
      */
     executeNode?: NodeExecutor;
+    /**
+     * How many linked graphs deep a call may go before the scheduler calls it
+     * a runaway (2.3, default 32).  A graph that contains itself stops itself,
+     * the way a recursive function does; this is the ceiling for one that does
+     * not, and it fails naming the path it took.
+     */
+    linkedGraphDepth?: number;
 }
 /** See `SchedulerOptions.executeNode`. */
 export type NodeExecutor = (info: {

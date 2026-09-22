@@ -3,6 +3,8 @@ import {execute} from "./Edge";
 import {ConnectorEvent, LoadEvent, Graph, newId, Logger, nullLogger,
     SchedulerEvent, ExecutionResult, Warning, EdgeError, NodeSetEvent, SchedulerOptions} from "./Shared";
 import Loader from "./Loader";
+import type {GraphInstance} from "./Instances";
+import {pristine} from "./Instances";
 import {Execution, ExecutionHandle, BudgetSpec} from "./Execution";
 /**
  * # Scheduler
@@ -153,6 +155,25 @@ export default class Scheduler {
     nodeCache: {
         [key: string]: {};
     };
+    /**
+     * Live copies of linked graphs, by the path of host nodes they were
+     * reached through (2.3).  A linked graph is instantiated when a value
+     * arrives at it, so the same use keeps its nodes and their data between
+     * calls, two uses share nothing, and a graph reached through itself is a
+     * deeper path — which is what makes recursion possible.
+     */
+    instances: {
+        [key: string]: GraphInstance;
+    };
+    /**
+     * Each document as it was before anything ran, kept against the object it
+     * came from (2.3).  An instance is a copy of the *document*, not of
+     * whatever the running graph has become — a recursive call must not start
+     * life holding what its caller was in the middle of.  Keyed by identity
+     * rather than by id, because two graphs may honestly share an id and
+     * version while being different documents.
+     */
+    documents: WeakMap<Graph, Graph>;
     /** The parameterized path to linked graph documents */
     graphPath: string;
     /** The parameterized path to linked node documents */
@@ -229,6 +250,9 @@ export default class Scheduler {
         this.state = state;
         this.events = {};
         this.nodeCache = {};
+        this.instances = {};
+        this.documents = new WeakMap();
+        this.documents.set(graph, pristine(graph));
         this.graphPath = "artifacts/graph/{id}.{version}";
         this.nodePath = "artifacts/nodes/{id}.{version}";
         this.logger = logger;
