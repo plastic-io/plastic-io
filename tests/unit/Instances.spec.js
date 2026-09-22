@@ -215,3 +215,88 @@ describe("loading at the moment of the call", () => {
         expect(state.ran).toBe(2);
     });
 });
+
+describe("what a node inside a call knows about the call", () => {
+    /**
+     * The instance is the graph a node is running in, not a badge handed to
+     * whichever node the call arrived at.  A node two connectors deep into a
+     * called graph belongs to that call as much as the first one does.
+     */
+    const twoDeep = () => {
+        const inner = graph("inner", [
+            node("front", "edges.on = value;", {url: "front", graphId: "inner", edges: [edge("on", [to("back", "in", "inner")])]}),
+            node("back", `
+                instance && (instance.state.seen = (instance.state.seen || 0) + 1);
+                state.inside = state.inside || [];
+                state.inside.push({who: instance ? instance.path.join("/") : null, depth: instance ? instance.depth : 0, seen: instance ? instance.state.seen : null});
+            `, {url: "back", graphId: "inner", edges: []}),
+        ]);
+        const g = graph("root", [
+            node("entry", "edges.left = value; edges.right = value;", {
+                edges: [edge("left", [to("first", "in")]), edge("right", [to("second", "in")])],
+            }),
+            node("first", "", {edges: []}),
+            node("second", "", {edges: []}),
+        ]);
+        [1, 2].forEach((i) => {
+            g.nodes[i].linkedGraph = {
+                id: "inner", version: 0, loaded: false, graph: inner, properties: {}, data: {},
+                fields: {inputs: {in: {id: "front", field: "in"}}, outputs: {}},
+            };
+        });
+        return g;
+    };
+
+    it("a node two connectors in still belongs to the call it was reached through", async () => {
+        const state = {};
+        const scheduler = new Scheduler(twoDeep(), {}, state);
+        await scheduler.url("entry", {});
+        await settle();
+        expect(state.inside.map((i) => i.who).sort()).toEqual(["first", "second"]);
+        expect(state.inside.every((i) => i.depth === 1 && i.seen === 1)).toBe(true);
+    });
+
+    it("and the same use called twice keeps that instance's scratch", async () => {
+        const state = {};
+        const scheduler = new Scheduler(twoDeep(), {}, state);
+        await scheduler.url("entry", {});
+        await settle();
+        await scheduler.url("entry", {});
+        await settle();
+        expect(state.inside.filter((i) => i.who === "first").map((i) => i.seen)).toEqual([1, 2]);
+    });
+});
+
+describe("a resolver that has to go and get it", () => {
+    /**
+     * The `load` event is how an embedder answers "where is this graph?", and
+     * an embedder that has to ask a server answers with a promise.  The loader
+     * used to check its cache the moment the listener *started*, so every
+     * asynchronous resolver lost the race and it fell through to fetching the
+     * path as if it were a URL.
+     */
+    it("is waited for, rather than raced", async () => {
+        const inner = graph("remote", [node("inner", "state.ran = (state.ran || 0) + 1;", {url: "inner", graphId: "remote", edges: []})]);
+        const g = graph("root", [
+            node("entry", "edges.out = value;", {edges: [edge("out", [to("host", "in")])]}),
+            node("host", "", {edges: []}),
+        ]);
+        g.nodes[1].linkedGraph = {
+            id: "remote", version: 0, loaded: false, properties: {}, data: {},
+            fields: {inputs: {in: {id: "inner", field: "in"}}, outputs: {}},
+        };
+        global.fetch = () => { throw new Error("the loader should not have fetched anything"); };
+        const state = {};
+        const scheduler = new Scheduler(g, {}, state);
+        const asked = [];
+        scheduler.addEventListener("load", async (e) => {
+            asked.push(e.url);
+            await new Promise((resolve) => setTimeout(resolve, 20));
+            e.setValue(inner);
+        });
+        await scheduler.url("entry", {});
+        await settle();
+        expect(asked).toEqual(["artifacts/graph/remote.0"]);
+        expect(state.ran).toBe(1);
+    });
+});

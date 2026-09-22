@@ -278,18 +278,29 @@ export default class Scheduler {
         this.events[eventName] = this.events[eventName] || [];
         this.events[eventName].push(listener);
     }
-    /** Dispatches an event.  Every event is stamped with the next `seq` (2.1). */
-    dispatchEvent(eventName: string, eventData: SchedulerEvent): void {
+    /**
+     * Dispatches an event.  Every event is stamped with the next `seq` (2.1).
+     *
+     * What each listener returned comes back, which matters for exactly one
+     * event: `load`.  A listener that has to go and fetch something answers
+     * with a promise, and the loader waits for it (2.3.1) — before that it
+     * checked its cache the moment the last listener *started*, so every
+     * asynchronous resolver lost the race and the loader fell through to
+     * fetching the path as a URL, which is not one.
+     */
+    dispatchEvent(eventName: string, eventData: SchedulerEvent): any[] {
         this.logger.debug("Scheduler: Dispatch event " + eventName);
         if (eventData && typeof eventData === "object" && eventData.seq === undefined) {
             this.sequence += 1;
             eventData.seq = this.sequence;
         }
+        const answers: any[] = [];
         if (this.events[eventName]) {
             for (const listener of this.events[eventName]) {
-                listener.call(this, eventData);
+                answers.push(listener.call(this, eventData));
             }
         }
+        return answers;
     }
     getNodePath(id: string, version: number): string {
         return this.nodePath.replace("{id}", id).replace("{version}", version.toString());

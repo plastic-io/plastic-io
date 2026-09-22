@@ -2,7 +2,7 @@ import Edge, {execute as edgeExecute} from "./Edge";
 import {parseScript} from 'meriyah';
 import {generate} from "escodegen";
 import Scheduler from "./Scheduler";
-import {GraphInstance, instanceFor, graphForConnector} from "./Instances";
+import {GraphInstance, instanceFor, instanceOf, graphForConnector} from "./Instances";
 import {ConnectorEvent, Graph, newId, EdgeError, NodeTemplate,
     LinkedNode, LinkedGraph, NodeInterface, NodeSetEvent, HostInterface, ObservationEvent, EventIds} from "./Shared";
 import {Span, Execution, ExecutionCancelled} from "./Execution";
@@ -347,7 +347,12 @@ export async function execute(scheduler: Scheduler, graph: Graph, node: Node, fi
      * Recursion is that, and nothing more; a graph that does not stop itself
      * meets the depth ceiling and fails saying which path it took.
      */
-    let instance: GraphInstance | undefined;
+    // Every node running inside an instance belongs to it, not only the one
+    // the call arrived at: the graph a node is running in *is* the instance, so
+    // it is asked rather than tracked.  Without this, a node two connectors
+    // into a called graph had no idea which call it was part of, and per-instance
+    // state stopped at the front door.
+    let instance: GraphInstance | undefined = instanceOf(graph);
     if (vect.linkedGraph) {
         // A graph that cannot be instantiated — it will not load, or the
         // recursion has gone past the ceiling — throws from here and is

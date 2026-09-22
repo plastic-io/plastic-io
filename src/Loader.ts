@@ -31,7 +31,14 @@ export default class Loader<T> {
                 this.cache[url] = val;
             }
         } as LoadEvent;
-        this.scheduler.dispatchEvent("load", ev);
+        // A listener that has to fetch what was asked for answers with a
+        // promise; waiting for it is the difference between a resolver that
+        // works and one that is always too late.
+        const answers = this.scheduler.dispatchEvent("load", ev) || [];
+        const waiting = answers.filter((answer: any) => answer && typeof answer.then === "function");
+        if (waiting.length) {
+            await Promise.all(waiting);
+        }
         if (this.cache[url]) {
             this.scheduler.logger.debug("Loader: cache hit: " + url);
             return this.cache[url];
